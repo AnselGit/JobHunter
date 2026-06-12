@@ -1,0 +1,30 @@
+/* Track page custom styles */
+.track-hero {
+  background: linear-gradient(180deg, #51B1FF 0%, #FFFFFF 70%);
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* subtle grid overlay to hint at the design mock */
+.track-hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 64px 64px, 64px 64px;
+  pointer-events: none;
+}
+
+.jobhunter-logo-large {
+  opacity: 0.06;
+}
+
+/* helper to keep hero content vertically centered while header stays at top */
+.track-hero .hero-inner {
+  /* Prefer Tailwind utilities for sizing; this is a fallback if needed. */
+  height: calc(100vh - 72px);
+}
+
+/* Keep gradient and subtle grid overlay in plain CSS; rest is handled by Tailwind utilities */
