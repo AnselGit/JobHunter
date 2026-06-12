@@ -7,39 +7,47 @@
   overflow: hidden;
 }
 
-/* subtle grid overlay to hint at the design mock */
+/* large centered grid overlay - horizontal lines */
 .track-hero::before {
   content: "";
   position: absolute;
   inset: 0;
-  /* layered grids: fine (32px) and coarse (160px) for larger squares */
-  background-image:
-    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
-    linear-gradient(rgba(255,255,255,0.09) 2px, transparent 2px),
-    linear-gradient(90deg, rgba(255,255,255,0.09) 2px, transparent 2px);
-  background-size: 32px 32px, 32px 32px, 160px 160px, 160px 160px;
-  background-position: 0 0, 0 0, -8px -8px, -8px -8px;
   pointer-events: none;
-  opacity: 0.85;
-  transform: translateZ(0);
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%);
-  mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%);
+  background: linear-gradient(180deg, #67BBFF 0%, #CCE8FF 45%, #D5ECFF 100%);
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%),
+                       repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 calc(160px - 1px), rgba(0,0,0,1) calc(160px - 1px) 160px);
+  -webkit-mask-position: center center, center center;
+  -webkit-mask-size: 100% 100%, 160px 160px;
+  -webkit-mask-repeat: no-repeat, repeat;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%),
+              repeating-linear-gradient(180deg, rgba(0,0,0,0) 0 calc(160px - 1px), rgba(0,0,0,1) calc(160px - 1px) 160px);
+  mask-position: center center, center center;
+  mask-size: 100% 100%, 160px 160px;
+  mask-repeat: no-repeat, repeat;
+  z-index: 0;
 }
 
-/* subtle column guides (heavier, widely spaced vertical lines) */
+/* large centered grid overlay - vertical lines */
 .track-hero::after {
   content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: calc(100% / 12) 100%;
-  background-repeat: repeat;
-  opacity: 0.55;
-  mix-blend-mode: overlay;
-  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0) 100%);
-  mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.25) 70%, rgba(0,0,0,0) 100%);
+  transform: translateZ(0);
+  background: linear-gradient(180deg, #67BBFF 0%, #CCE8FF 45%, #D5ECFF 100%);
+  opacity: 0.9;
+  -webkit-mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%),
+                       repeating-linear-gradient(90deg, rgba(0,0,0,0) 0 calc(160px - 1px), rgba(0,0,0,1) calc(160px - 1px) 160px);
+  -webkit-mask-position: center center, center center;
+  -webkit-mask-size: 100% 100%, 160px 160px;
+  -webkit-mask-repeat: no-repeat, repeat;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,1) 0%, rgba(0,0,0,0.35) 75%, rgba(0,0,0,0) 100%),
+              repeating-linear-gradient(90deg, rgba(0,0,0,0) 0 calc(160px - 1px), rgba(0,0,0,1) calc(160px - 1px) 160px);
+  mask-position: center center, center center;
+  mask-size: 100% 100%, 160px 160px;
+  mask-repeat: no-repeat, repeat;
+  z-index: 0;
 }
 
 .jobhunter-logo-large {

@@ -67,31 +67,33 @@ export default function Track() {
                     </div>
                 </header>
 
-                <div className="w-full px-6 lg:px-12">
-                    <h1 className="leading-relaxed">
-                        <div className="text-[clamp(36px,9vw,128px)] text-white font-sans font-semibold">
-                            Track <span className="font-normal">Every</span>
-                        </div>
+                <div className="track-hero-content relative z-10 w-full px-6 lg:px-12 min-h-screen flex items-center">
+                    <div className="w-full">
+                        <h1 className="leading-relaxed">
+                            <div className="text-[clamp(36px,9vw,128px)] text-white font-sans font-semibold">
+                                Track <span className="font-normal">Every</span>
+                            </div>
 
-                        <div className="flex justify-end">
-                            <span className="italic text-sky-300 text-[clamp(36px,9vw,128px)]">
-                                Application
-                            </span>
-                        </div>
-                    </h1>
+                            <div className="flex justify-end">
+                                <span className="italic text-sky-300 text-[clamp(36px,9vw,128px)]">
+                                    Application
+                                </span>
+                            </div>
+                        </h1>
 
-                    <div className="mt-4 lg:grid lg:grid-cols-2 lg:items-center gap-6">
-                        <div className="hidden lg:block">
-                            {/* decorative / illustration space */}
+                        <div className="mt-4 lg:grid lg:grid-cols-2 lg:items-center gap-6">
+                            <div className="hidden lg:block">
+                                {/* decorative / illustration space */}
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div className="absolute left-0 bottom-0 p-6 lg:p-12">
-                    <p className="max-w-xl text-xl text-sky-300">
-                        Organize applications, monitor interview stages, track responses,
-                        and never miss an opportunity again.
-                    </p>
+                    <div className="absolute left-0 bottom-0 p-6 lg:p-12">
+                        <p className="max-w-xl text-xl text-sky-300">
+                            Organize applications, monitor interview stages, track responses,
+                            and never miss an opportunity again.
+                        </p>
+                    </div>
                 </div>
             </div>
 
