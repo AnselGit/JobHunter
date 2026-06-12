@@ -1,5 +1,6 @@
 import { Head } from '@inertiajs/react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import logoUrl from '../../assets/JobHunter_Logo.png';
 
 type Application = {
     id: number;
@@ -22,6 +23,11 @@ const SAMPLE_DATA: Application[] = [
 
 export default function Track() {
     const [query, setQuery] = useState<string>('');
+    const [logoMounted, setLogoMounted] = useState(false);
+
+    useEffect(() => {
+        setLogoMounted(true);
+    }, []);
 
     const filtered = useMemo(() => {
         if (!query.trim()) return SAMPLE_DATA;
@@ -43,7 +49,9 @@ export default function Track() {
                     <div className="container mx-auto px-6 py-6">
                         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
                             <div className="flex items-center gap-3">
-                                <img src={new URL('../../assets/JobHunter_Logo.png', import.meta.url).href} alt="JobHunter logo" className="h-8 w-auto" />
+                                {logoMounted && (
+                                    <img src={logoUrl} alt="JobHunter logo" className="h-8 w-auto" />
+                                )}
                                 <div className="text-2xl font-bold text-white">JobHunter</div>
                             </div>
                             <nav className="hidden md:flex justify-center gap-6 text-sm text-white/90">
