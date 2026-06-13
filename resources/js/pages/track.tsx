@@ -24,21 +24,73 @@ const SAMPLE_DATA: Application[] = [
 export default function Track() {
     const [query, setQuery] = useState<string>('');
     const [logoMounted, setLogoMounted] = useState(false);
+    const [data, setData] = useState<Application[]>(SAMPLE_DATA);
 
     useEffect(() => {
         setLogoMounted(true);
     }, []);
 
     const filtered = useMemo(() => {
-        if (!query.trim()) return SAMPLE_DATA;
+        if (!query.trim()) return data;
         const q = query.toLowerCase();
-        return SAMPLE_DATA.filter((a) =>
+        return data.filter((a) =>
             a.company.toLowerCase().includes(q) ||
             a.location.toLowerCase().includes(q) ||
             (a.note || '').toLowerCase().includes(q) ||
             a.status.toLowerCase().includes(q)
         );
-    }, [query]);
+    }, [query, data]);
+
+    const statusClass = (s: string) => {
+        switch ((s || '').toLowerCase()) {
+            case 'applied':
+                return 'inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-sky-100 text-sky-700';
+            case 'interview':
+                return 'inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-700';
+            case 'offer':
+                return 'inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700';
+            case 'rejected':
+                return 'inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-700';
+            default:
+                return 'inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700';
+        }
+    };
+
+    const statusSelectClass = (s: string) => {
+        switch ((s || '').toLowerCase()) {
+            case 'applied':
+                return 'bg-sky-100 text-sky-700';
+            case 'interview':
+                return 'bg-yellow-100 text-yellow-700';
+            case 'offer':
+                return 'bg-green-100 text-green-700';
+            case 'rejected':
+                return 'bg-red-100 text-red-700';
+            default:
+                return 'bg-gray-100 text-gray-700';
+        }
+    };
+
+    const updateField = (id: number, field: Exclude<keyof Application, 'id'>, value: string) => {
+        setData((prev) => prev.map((a) => (a.id === id ? ({ ...a, [field]: value } as Application) : a)));
+    };
+
+    const [page, setPage] = useState<number>(1);
+    const itemsPerPage = 10;
+
+    useEffect(() => {
+        setPage(1);
+    }, [filtered]);
+
+    const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
+
+    const paginated = useMemo(() => {
+        const start = (page - 1) * itemsPerPage;
+        return filtered.slice(start, start + itemsPerPage);
+    }, [filtered, page]);
+
+    const startIndex = filtered.length === 0 ? 0 : (page - 1) * itemsPerPage + 1;
+    const endIndex = Math.min(page * itemsPerPage, filtered.length);
 
     return (
         <>
@@ -68,7 +120,7 @@ export default function Track() {
                 </header>
 
                 <div className="track-hero-content relative z-10 w-full px-6 lg:px-12 min-h-screen flex items-center">
-                    <div className="w-full">
+                    <div className="w-full max-w-7xl mx-auto">
                         <h1 className="leading-relaxed">
                             <div className="text-[clamp(36px,9vw,128px)] text-white font-sans font-semibold">
                                 Track <span className="font-normal">Every</span>
@@ -97,59 +149,138 @@ export default function Track() {
                 </div>
             </div>
 
-            <section className="bg-transparent py-12">
-                <div className="container mx-auto px-6">
-                    <div className="mb-6">
-                        <div className="grid grid-cols-[1fr_auto] gap-3">
-                            <input
-                                value={query}
-                                onChange={(e) => setQuery(e.target.value)}
-                                placeholder="Search companies, locations, notes..."
-                                className="w-full rounded-full border border-sky-200 px-4 py-3 shadow-sm"
-                            />
-                            <button className="rounded-full bg-sky-500 px-4 py-3 text-white">Search</button>
-                        </div>
-                    </div>
+            <section className="track-section min-h-screen py-12">
+                <div
+                    className="absolute left-0 right-0 top-0 h-px opacity-90 pointer-events-none"
+                    aria-hidden="true"
+                    style={{ background: '#CCE8FF' }}
+                />
 
-                    <div className="rounded-xl bg-white shadow p-4">
-                        <div className="overflow-x-auto">
-                            <table className="w-full table-auto text-sm">
-                                <thead>
-                                    <tr className="bg-sky-100 text-sky-700">
-                                        <th className="p-3 text-left">Company</th>
-                                        <th className="p-3 text-left">Location</th>
-                                        <th className="p-3 text-left">Salary</th>
-                                        <th className="p-3 text-left">Date Applied</th>
-                                        <th className="p-3 text-left">Status</th>
-                                        <th className="p-3 text-left">Note</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {filtered.length > 0 ? (
-                                        filtered.map((a) => (
-                                            <tr key={a.id} className="border-t">
-                                                <td className="p-4 align-top">{a.company}</td>
-                                                <td className="p-4 align-top">{a.location}</td>
-                                                <td className="p-4 align-top">{a.salary}</td>
-                                                <td className="p-4 align-top">{a.dateApplied}</td>
-                                                <td className="p-4 align-top">{a.status}</td>
-                                                <td className="p-4 align-top text-slate-500">{a.note}</td>
-                                            </tr>
-                                        ))
-                                    ) : (
+                <div className="track-overlay absolute inset-0 flex items-center justify-center z-30 pointer-events-auto">
+                    <div className="w-full max-w-6xl px-6">
+                        <div className="mb-6 flex justify-center">
+                            <div className="w-full max-w-2xl">
+                                <div className="grid grid-cols-[1fr_auto] gap-3">
+                                    <input
+                                        value={query}
+                                        onChange={(e) => setQuery(e.target.value)}
+                                        placeholder="Search companies, locations, notes..."
+                                        className="w-full rounded-full bg-white/80 backdrop-blur-sm border border-white/30 px-4 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 transition"
+                                    />
+                                    <button className="rounded-full bg-sky-600 hover:bg-sky-700 px-5 py-3 text-white shadow-lg transition">Search</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="rounded-2xl bg-white/95 backdrop-blur-sm border border-slate-100 shadow-xl p-6 mx-auto max-w-6xl">
+                            <div className="overflow-x-auto">
+                                <table className="min-w-full divide-y divide-slate-200">
+                                    <thead>
                                         <tr>
-                                            <td colSpan={6} className="py-10 text-center text-slate-400">
-                                                No results found
-                                            </td>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Company</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Location</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Salary</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Date Applied</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Note</th>
                                         </tr>
-                                    )}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody className="bg-white divide-y divide-slate-100">
+                                        {filtered.length > 0 ? (
+                                            paginated.map((a) => (
+                                                <tr key={a.id} className="odd:bg-white even:bg-slate-50 hover:bg-slate-100 transition-colors">
+                                                    <td className="px-3 py-3 align-top text-sm text-slate-800">
+                                                        <input
+                                                            value={a.company}
+                                                            onChange={(e) => updateField(a.id, 'company', e.target.value)}
+                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-800"
+                                                        />
+                                                    </td>
+                                                    <td className="px-3 py-3 align-top text-sm text-slate-700">
+                                                        <input
+                                                            value={a.location}
+                                                            onChange={(e) => updateField(a.id, 'location', e.target.value)}
+                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
+                                                        />
+                                                    </td>
+                                                    <td className="px-3 py-3 align-top text-sm text-slate-700">
+                                                        <input
+                                                            value={a.salary}
+                                                            onChange={(e) => updateField(a.id, 'salary', e.target.value)}
+                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
+                                                        />
+                                                    </td>
+                                                    <td className="px-3 py-3 align-top text-sm text-slate-700">
+                                                        <input
+                                                            type="date"
+                                                            value={a.dateApplied}
+                                                            onChange={(e) => updateField(a.id, 'dateApplied', e.target.value)}
+                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
+                                                        />
+                                                    </td>
+                                                    <td className="px-3 py-3 align-top text-sm">
+                                                        <select
+                                                            value={a.status}
+                                                            onChange={(e) => updateField(a.id, 'status', e.target.value)}
+                                                            className={`rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}
+                                                        >
+                                                            <option>Applied</option>
+                                                            <option>Interview</option>
+                                                            <option>Offer</option>
+                                                            <option>Rejected</option>
+                                                        </select>
+                                                    </td>
+                                                    <td className="px-3 py-3 align-top text-sm text-slate-500">
+                                                        <input
+                                                            value={a.note || ''}
+                                                            onChange={(e) => updateField(a.id, 'note', e.target.value)}
+                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-500"
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={6} className="py-10 text-center text-slate-400">No results found</td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
 
-                        <div className="mt-4 grid grid-cols-2 items-center text-sm text-sky-600">
-                            <span>Showing {filtered.length} of {SAMPLE_DATA.length}</span>
-                            <a href="#" className="underline justify-self-end">Next</a>
+                            <div className="mt-4 flex items-center justify-between text-sm text-slate-600">
+                                <div>
+                                    Showing {startIndex === 0 ? 0 : startIndex} - {endIndex} of {filtered.length}
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                        disabled={page <= 1}
+                                        className={`px-3 py-1 rounded ${page <= 1 ? 'text-slate-400' : 'text-slate-700 hover:bg-slate-100'}`}
+                                    >
+                                        Prev
+                                    </button>
+
+                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                                        <button
+                                            key={p}
+                                            onClick={() => setPage(p)}
+                                            className={`px-3 py-1 rounded ${p === page ? 'bg-sky-600 text-white' : 'text-slate-700 hover:bg-slate-100'}`}
+                                        >
+                                            {p}
+                                        </button>
+                                    ))}
+
+                                    <button
+                                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                        disabled={page >= totalPages}
+                                        className={`px-3 py-1 rounded ${page >= totalPages ? 'text-slate-400' : 'text-slate-700 hover:bg-slate-100'}`}
+                                    >
+                                        Next
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

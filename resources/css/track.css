@@ -71,3 +71,65 @@
 }
 
 /* Keep gradient and subtle grid overlay in plain CSS; rest is handled by Tailwind utilities */
+
+/* Track section gradient that continues the hero's feel. */
+.track-section {
+  background: linear-gradient(180deg, #FFFFFF 0%, #51B1FF 70%, #A8D8FF 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+  z-index: 1;
+}
+
+/* grid overlay for track section - horizontal lines */
+.track-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, #CCE8FF 0%, #67BBFF 70%, #D5ECFF 100%);
+  opacity: 0.9;
+  /* mask only the repeating horizontal lines so the gradient shows inside the lines */
+  -webkit-mask-image: repeating-linear-gradient(
+    180deg,
+    rgba(0,0,0,0) 0 calc(160px - 1px),
+    rgba(0,0,0,1) calc(160px - 1px) 160px
+  );
+  -webkit-mask-size: 160px 160px;
+  -webkit-mask-repeat: repeat;
+  mask-image: repeating-linear-gradient(
+    180deg,
+    rgba(0,0,0,0) 0 calc(160px - 1px),
+    rgba(0,0,0,1) calc(160px - 1px) 160px
+  );
+  mask-size: 160px 160px;
+  mask-repeat: repeat;
+  z-index: 0;
+}
+
+/* grid overlay for track section - vertical lines */
+.track-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transform: translateZ(0);
+  background: linear-gradient(180deg, #CCE8FF 0%, #67BBFF 70%, #D5ECFF 100%);
+  opacity: 0.9;
+  /* mask only the repeating vertical lines so the gradient shows inside the lines */
+  -webkit-mask-image: repeating-linear-gradient(
+    90deg,
+    rgba(0,0,0,0) 0 calc(160px - 1px),
+    rgba(0,0,0,1) calc(160px - 1px) 160px
+  );
+  -webkit-mask-size: 160px 160px;
+  -webkit-mask-repeat: repeat;
+  mask-image: repeating-linear-gradient(
+    90deg,
+    rgba(0,0,0,0) 0 calc(160px - 1px),
+    rgba(0,0,0,1) calc(160px - 1px) 160px
+  );
+  mask-size: 160px 160px;
+  mask-repeat: repeat;
+  z-index: 0;
+}
