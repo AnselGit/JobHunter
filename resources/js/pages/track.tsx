@@ -30,16 +30,66 @@ export default function Track() {
         setLogoMounted(true);
     }, []);
 
+    const [sortBy, setSortBy] = useState<keyof Application | null>(null);
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
+
+    const parseSalary = (val?: string) => {
+        if (!val) return 0;
+        let s = String(val).toLowerCase().replace(/\$/g, '').replace(/,/g, '').trim();
+        let multiplier = 1;
+        if (s.endsWith('k')) {
+            multiplier = 1000;
+            s = s.slice(0, -1);
+        } else if (s.endsWith('m')) {
+            multiplier = 1000000;
+            s = s.slice(0, -1);
+        }
+        const n = parseFloat(s);
+        return isNaN(n) ? 0 : n * multiplier;
+    };
+
+    const handleSort = (key: keyof Application) => {
+        if (sortBy === key) {
+            setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+        } else {
+            setSortBy(key);
+            setSortDir('asc');
+        }
+        setPage(1);
+    };
+
     const filtered = useMemo(() => {
-        if (!query.trim()) return data;
-        const q = query.toLowerCase();
-        return data.filter((a) =>
-            a.company.toLowerCase().includes(q) ||
-            a.location.toLowerCase().includes(q) ||
-            (a.note || '').toLowerCase().includes(q) ||
-            a.status.toLowerCase().includes(q)
-        );
-    }, [query, data]);
+        let result = data;
+        if (query.trim()) {
+            const q = query.toLowerCase();
+            result = data.filter((a) =>
+                a.company.toLowerCase().includes(q) ||
+                a.location.toLowerCase().includes(q) ||
+                (a.note || '').toLowerCase().includes(q) ||
+                a.status.toLowerCase().includes(q)
+            );
+        }
+
+        if (sortBy) {
+            result = [...result].sort((a, b) => {
+                const av = (a as any)[sortBy];
+                const bv = (b as any)[sortBy];
+                let cmp = 0;
+                if (sortBy === 'dateApplied') {
+                    const da = new Date(av).getTime() || 0;
+                    const db = new Date(bv).getTime() || 0;
+                    cmp = da - db;
+                } else if (sortBy === 'salary') {
+                    cmp = parseSalary(av) - parseSalary(bv);
+                } else {
+                    cmp = String(av || '').localeCompare(String(bv || ''));
+                }
+                return sortDir === 'asc' ? cmp : -cmp;
+            });
+        }
+
+        return result;
+    }, [query, data, sortBy, sortDir]);
 
     const statusClass = (s: string) => {
         switch ((s || '').toLowerCase()) {
@@ -165,9 +215,29 @@ export default function Track() {
                                         value={query}
                                         onChange={(e) => setQuery(e.target.value)}
                                         placeholder="Search companies, locations, notes..."
-                                        className="w-full rounded-full bg-white/80 backdrop-blur-sm border border-white/30 px-4 py-3 shadow-md focus:outline-none focus:ring-2 focus:ring-sky-300 transition"
+                                        className="
+                                            w-full
+                                            rounded-tl-3xl
+                                            rounded-tr-md
+                                            rounded-bl-3xl
+                                            rounded-br-md
+                                            bg-white/80
+                                            backdrop-blur-sm
+                                            border border-white/30
+                                            px-4 py-3
+                                            shadow-md
+                                            focus:outline-none
+                                            focus:ring-2
+                                            focus:ring-sky-300
+                                            transition
+                                        "
                                     />
-                                    <button className="rounded-full bg-sky-600 hover:bg-sky-700 px-5 py-3 text-white shadow-lg transition">Search</button>
+                                    <button className="
+                                            rounded-tl-md
+                                            rounded-tr-3xl
+                                            rounded-bl-md
+                                            rounded-br-3xl
+                                            bg-sky-600 hover:bg-sky-700 px-5 py-3 text-white shadow-lg transition">Search</button>
                                 </div>
                             </div>
                         </div>
@@ -177,11 +247,46 @@ export default function Track() {
                                 <table className="min-w-full divide-y divide-slate-200">
                                     <thead>
                                         <tr>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Company</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Location</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Salary</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Date Applied</th>
-                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Status</th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                                                <button type="button" onClick={() => handleSort('company')} className="flex items-center gap-2">
+                                                    <span>Company</span>
+                                                    <span className={`text-xs ${sortBy === 'company' ? 'text-sky-600' : 'text-slate-400'}`}>
+                                                        {sortBy === 'company' ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                                                    </span>
+                                                </button>
+                                            </th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                                                <button type="button" onClick={() => handleSort('location')} className="flex items-center gap-2">
+                                                    <span>Location</span>
+                                                    <span className={`text-xs ${sortBy === 'location' ? 'text-sky-600' : 'text-slate-400'}`}>
+                                                        {sortBy === 'location' ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                                                    </span>
+                                                </button>
+                                            </th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                                                <button type="button" onClick={() => handleSort('salary')} className="flex items-center gap-2">
+                                                    <span>Salary</span>
+                                                    <span className={`text-xs ${sortBy === 'salary' ? 'text-sky-600' : 'text-slate-400'}`}>
+                                                        {sortBy === 'salary' ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                                                    </span>
+                                                </button>
+                                            </th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                                                <button type="button" onClick={() => handleSort('dateApplied')} className="flex items-center gap-2">
+                                                    <span>Date Applied</span>
+                                                    <span className={`text-xs ${sortBy === 'dateApplied' ? 'text-sky-600' : 'text-slate-400'}`}>
+                                                        {sortBy === 'dateApplied' ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                                                    </span>
+                                                </button>
+                                            </th>
+                                            <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">
+                                                <button type="button" onClick={() => handleSort('status')} className="flex items-center gap-2">
+                                                    <span>Status</span>
+                                                    <span className={`text-xs ${sortBy === 'status' ? 'text-sky-600' : 'text-slate-400'}`}>
+                                                        {sortBy === 'status' ? (sortDir === 'asc' ? '▲' : '▼') : '↕'}
+                                                    </span>
+                                                </button>
+                                            </th>
                                             <th className="px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase tracking-wide">Note</th>
                                         </tr>
                                     </thead>
