@@ -125,6 +125,28 @@ export default function Track() {
         setData((prev) => prev.map((a) => (a.id === id ? ({ ...a, [field]: value } as Application) : a)));
     };
 
+    const addApplication = () => {
+        if (!newApplication.company.trim()) return;
+
+        const application: Application = {
+            id: Date.now(),
+            ...newApplication,
+        };
+
+        setData((prev) => [application, ...prev]);
+
+        setNewApplication({
+            company: '',
+            location: '',
+            salary: '',
+            dateApplied: '',
+            status: 'Applied',
+            note: '',
+        });
+
+        setShowModal(false);
+    };
+
     const [page, setPage] = useState<number>(1);
     const itemsPerPage = 10;
 
@@ -141,6 +163,19 @@ export default function Track() {
 
     const startIndex = filtered.length === 0 ? 0 : (page - 1) * itemsPerPage + 1;
     const endIndex = Math.min(page * itemsPerPage, filtered.length);
+
+    const [showModal, setShowModal] = useState(false);
+
+    const [newApplication, setNewApplication] = useState({
+        company: '',
+        location: '',
+        salary: '',
+        dateApplied: '',
+        status: 'Applied',
+        note: '',
+    });
+
+
 
     return (
         <>
@@ -232,12 +267,26 @@ export default function Track() {
                                             transition
                                         "
                                     />
-                                    <button className="
+                                    <button
+                                        onClick={() => setShowModal(true)}
+                                        className="
                                             rounded-tl-md
                                             rounded-tr-3xl
                                             rounded-bl-md
                                             rounded-br-3xl
-                                            bg-sky-600 hover:bg-sky-700 px-5 py-3 text-white shadow-lg transition">Search</button>
+                                            bg-sky-600
+                                            hover:bg-sky-700
+                                            w-14
+                                            flex items-center justify-center
+                                            text-white
+                                            shadow-lg
+                                            transition
+                                            text-2xl
+                                            font-light
+                                        "
+                                    >
+                                        +
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -390,6 +439,190 @@ export default function Track() {
                     </div>
                 </div>
             </section>
+
+            {showModal && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                    <div
+                        className="
+                            w-full
+                            max-w-2xl
+                            mx-4
+                            rounded-3xl
+                            border border-white/30
+                            bg-white/95
+                            backdrop-blur-md
+                            shadow-2xl
+                            overflow-hidden
+                        "
+                    >
+                        {/* Header */}
+                        <div className="bg-linear-to-r from-sky-500 to-sky-400 px-6 py-5">
+                            <h2 className="text-2xl font-semibold text-white">
+                                Add Application
+                            </h2>
+
+                            <p className="text-sky-100 text-sm mt-1">
+                                Track your next opportunity.
+                            </p>
+                        </div>
+
+                        {/* Body */}
+                        <div className="p-6 space-y-5">
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Company
+                                </label>
+
+                                <input
+                                    value={newApplication.company}
+                                    onChange={(e) =>
+                                        setNewApplication({
+                                            ...newApplication,
+                                            company: e.target.value,
+                                        })
+                                    }
+                                    className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                />
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Location
+                                    </label>
+
+                                    <input
+                                        value={newApplication.location}
+                                        onChange={(e) =>
+                                            setNewApplication({
+                                                ...newApplication,
+                                                location: e.target.value,
+                                            })
+                                        }
+                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Salary
+                                    </label>
+
+                                    <input
+                                        value={newApplication.salary}
+                                        onChange={(e) =>
+                                            setNewApplication({
+                                                ...newApplication,
+                                                salary: e.target.value,
+                                            })
+                                        }
+                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                    />
+                                </div>
+
+                            </div>
+
+                            <div className="grid md:grid-cols-2 gap-4">
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Date Applied
+                                    </label>
+
+                                    <input
+                                        type="date"
+                                        value={newApplication.dateApplied}
+                                        onChange={(e) =>
+                                            setNewApplication({
+                                                ...newApplication,
+                                                dateApplied: e.target.value,
+                                            })
+                                        }
+                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                        Status
+                                    </label>
+
+                                    <select
+                                        value={newApplication.status}
+                                        onChange={(e) =>
+                                            setNewApplication({
+                                                ...newApplication,
+                                                status: e.target.value,
+                                            })
+                                        }
+                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                    >
+                                        <option>Applied</option>
+                                        <option>Interview</option>
+                                        <option>Offer</option>
+                                        <option>Rejected</option>
+                                    </select>
+                                </div>
+
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Notes
+                                </label>
+
+                                <textarea
+                                    rows={4}
+                                    value={newApplication.note}
+                                    onChange={(e) =>
+                                        setNewApplication({
+                                            ...newApplication,
+                                            note: e.target.value,
+                                        })
+                                    }
+                                    className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                />
+                            </div>
+
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex justify-end gap-3 p-6 border-t border-slate-100">
+
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="
+                                    px-5 py-3
+                                    rounded-xl
+                                    bg-slate-100
+                                    hover:bg-slate-200
+                                    transition
+                                "
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={addApplication}
+                                className="
+                                    px-5 py-3
+                                    rounded-xl
+                                    bg-sky-600
+                                    hover:bg-sky-700
+                                    text-white
+                                    shadow-md
+                                    transition
+                                "
+                            >
+                                Add Application
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <footer className="border-t border-white/20 bg-transparent py-12">
                 <div className="container mx-auto px-6 text-sky-700">
