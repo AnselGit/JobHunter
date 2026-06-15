@@ -252,12 +252,9 @@ export default function Track() {
                                         placeholder="Search companies, locations, notes..."
                                         className="
                                             w-full
-                                            rounded-tl-3xl
-                                            rounded-tr-md
-                                            rounded-bl-3xl
-                                            rounded-br-md
+                                            rounded-full
                                             bg-white/80
-                                            backdrop-blur-sm
+                                            backdrop-blur-sm-[2px]
                                             border border-white/30
                                             px-4 py-3
                                             shadow-md
@@ -270,13 +267,10 @@ export default function Track() {
                                     <button
                                         onClick={() => setShowModal(true)}
                                         className="
-                                            rounded-tl-md
-                                            rounded-tr-3xl
-                                            rounded-bl-md
-                                            rounded-br-3xl
+                                            rounded-full
                                             bg-sky-600
                                             hover:bg-sky-700
-                                            w-14
+                                            w-13
                                             flex items-center justify-center
                                             text-white
                                             shadow-lg
@@ -441,39 +435,58 @@ export default function Track() {
             </section>
 
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+                <div
+                    className="
+                        fixed inset-0 z-50
+                        flex items-center justify-center
+                        bg-black/20
+                        backdrop-blur-sm
+                        p-4
+                        animate-fadeIn
+                    "
+                >
                     <div
                         className="
-                            w-full
-                            max-w-2xl
-                            mx-4
-                            rounded-3xl
-                            border border-white/30
-                            bg-white/95
-                            backdrop-blur-md
-                            shadow-2xl
+                            w-full max-w-lg
+                            bg-white
+                            rounded-2xl
+                            shadow-xl
+                            border border-slate-200
                             overflow-hidden
+                            animate-modalIn
                         "
                     >
                         {/* Header */}
-                        <div className="bg-linear-to-r from-sky-500 to-sky-400 px-6 py-5">
-                            <h2 className="text-2xl font-semibold text-white">
-                                Add Application
-                            </h2>
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                            <div>
+                                <h2 className="text-lg font-semibold text-slate-900">
+                                    Add Application
+                                </h2>
+                                <p className="text-xs text-slate-500">
+                                    Track your next opportunity
+                                </p>
+                            </div>
 
-                            <p className="text-sky-100 text-sm mt-1">
-                                Track your next opportunity.
-                            </p>
+                            <button
+                                onClick={() => setShowModal(false)}
+                                className="
+                                    h-8 w-8
+                                    rounded-lg
+                                    flex items-center justify-center
+                                    text-slate-500
+                                    hover:bg-slate-100
+                                "
+                            >
+                                ✕
+                            </button>
                         </div>
 
                         {/* Body */}
-                        <div className="p-6 space-y-5">
-
+                        <div className="p-5 space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                <label className="block text-xs font-medium text-slate-600 mb-1">
                                     Company
                                 </label>
-
                                 <input
                                     value={newApplication.company}
                                     onChange={(e) =>
@@ -482,17 +495,24 @@ export default function Track() {
                                             company: e.target.value,
                                         })
                                     }
-                                    className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                    className="
+                                        w-full
+                                        rounded-lg
+                                        border border-slate-200
+                                        px-3 py-2.5
+                                        focus:ring-2
+                                        focus:ring-sky-500
+                                        focus:border-sky-500
+                                        outline-none
+                                    "
                                 />
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-4">
-
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
                                         Location
                                     </label>
-
                                     <input
                                         value={newApplication.location}
                                         onChange={(e) =>
@@ -501,15 +521,14 @@ export default function Track() {
                                                 location: e.target.value,
                                             })
                                         }
-                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
                                         Salary
                                     </label>
-
                                     <input
                                         value={newApplication.salary}
                                         onChange={(e) =>
@@ -518,19 +537,16 @@ export default function Track() {
                                                 salary: e.target.value,
                                             })
                                         }
-                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     />
                                 </div>
-
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-4">
-
+                            <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                                        Date Applied
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Applied
                                     </label>
-
                                     <input
                                         type="date"
                                         value={newApplication.dateApplied}
@@ -540,15 +556,14 @@ export default function Track() {
                                                 dateApplied: e.target.value,
                                             })
                                         }
-                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
                                         Status
                                     </label>
-
                                     <select
                                         value={newApplication.status}
                                         onChange={(e) =>
@@ -557,7 +572,7 @@ export default function Track() {
                                                 status: e.target.value,
                                             })
                                         }
-                                        className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     >
                                         <option>Applied</option>
                                         <option>Interview</option>
@@ -565,16 +580,14 @@ export default function Track() {
                                         <option>Rejected</option>
                                     </select>
                                 </div>
-
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                <label className="block text-xs font-medium text-slate-600 mb-1">
                                     Notes
                                 </label>
-
                                 <textarea
-                                    rows={4}
+                                    rows={3}
                                     value={newApplication.note}
                                     onChange={(e) =>
                                         setNewApplication({
@@ -582,22 +595,26 @@ export default function Track() {
                                             note: e.target.value,
                                         })
                                     }
-                                    className="w-full rounded-xl border border-slate-200 px-4 py-3"
+                                    className="
+                                        w-full
+                                        rounded-lg
+                                        border border-slate-200
+                                        px-3 py-2.5
+                                        resize-none
+                                    "
                                 />
                             </div>
-
                         </div>
 
                         {/* Footer */}
-                        <div className="flex justify-end gap-3 p-6 border-t border-slate-100">
-
+                        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-100">
                             <button
                                 onClick={() => setShowModal(false)}
                                 className="
-                                    px-5 py-3
-                                    rounded-xl
-                                    bg-slate-100
-                                    hover:bg-slate-200
+                                    px-4 py-2
+                                    rounded-full
+                                    border border-slate-200
+                                    hover:bg-slate-50
                                     transition
                                 "
                             >
@@ -607,18 +624,16 @@ export default function Track() {
                             <button
                                 onClick={addApplication}
                                 className="
-                                    px-5 py-3
-                                    rounded-xl
+                                    px-4 py-2
+                                    rounded-full
                                     bg-sky-600
                                     hover:bg-sky-700
                                     text-white
-                                    shadow-md
                                     transition
                                 "
                             >
-                                Add Application
+                                Add
                             </button>
-
                         </div>
                     </div>
                 </div>
