@@ -1,7 +1,8 @@
 import { Head } from '@inertiajs/react';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
 import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
+import { Plus, ChevronUp } from "lucide-react";
 
 type Application = {
     id: number;
@@ -199,6 +200,70 @@ export default function Track() {
         "Email",
     ];
 
+    const trackRef = useRef<HTMLElement>(null);
+    const aboutRef = useRef<HTMLElement>(null);
+    const contactRef = useRef<HTMLDivElement>(null);
+
+    const smoothScrollTo = (targetY: number, duration = 650) => {
+        const startY = window.scrollY;
+        const diff = targetY - startY;
+        let startTime: number | null = null;
+
+        const easeInOutCubic = (t: number) =>
+            t < 0.5
+                ? 4 * t * t * t
+                : 1 - Math.pow(-2 * t + 2, 3) / 2;
+
+        const step = (timestamp: number) => {
+            if (!startTime) startTime = timestamp;
+
+            const elapsed = timestamp - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+
+            const eased = easeInOutCubic(progress);
+
+            window.scrollTo(0, startY + diff * eased);
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            }
+        };
+
+        requestAnimationFrame(step);
+    };
+    
+    const scrollToSection = (
+        ref: React.RefObject<HTMLElement | HTMLDivElement | null>
+    ) => {
+        if (!ref.current) return;
+
+        const offset = 80; // optional (header spacing)
+
+        const targetY =
+            ref.current.getBoundingClientRect().top +
+            window.scrollY -
+            offset;
+
+        smoothScrollTo(targetY, 700);
+    };
+
+    const [showScrollTop, setShowScrollTop] = useState(false);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setShowScrollTop(window.scrollY > 400);
+        };
+
+        window.addEventListener("scroll", handleScroll);
+
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+        };
+    }, []);
+
+    const scrollToTop = () => {
+        smoothScrollTo(0, 650);
+    };
     
     return (
         <>
@@ -215,13 +280,74 @@ export default function Track() {
                                 <div className="text-2xl font-bold text-white">JobHunter</div>
                             </div>
                             <nav className="hidden md:flex justify-center gap-6 text-sm text-white/90">
-                                <a className="hover:underline" href="#">Home</a>
-                                <a className="hover:underline" href="#">Track</a>
-                                <a className="hover:underline" href="#">About</a>
-                                <a className="hover:underline" href="#">Contact</a>
+                                <button
+                                    onClick={() => scrollToSection(trackRef)}
+                                    className="
+                                        cursor-pointer
+                                        px-2 py-1
+                                        rounded-md
+                                        transition-all
+                                        duration-300
+                                        hover:text-white
+                                        hover:bg-white/10
+                                        hover:scale-105
+                                    "
+                                >
+                                    Home
+                                </button>
+
+                                <button
+                                    onClick={() => scrollToSection(aboutRef)}
+                                    className="
+                                        cursor-pointer
+                                        px-2 py-1
+                                        rounded-md
+                                        transition-all
+                                        duration-300
+                                        hover:text-white
+                                        hover:bg-white/10
+                                        hover:scale-105
+                                    "
+                                >
+                                    About
+                                </button>
+
+                                <button
+                                    onClick={() => scrollToSection(contactRef)}
+                                    className="
+                                        cursor-pointer
+                                        px-2 py-1
+                                        rounded-md
+                                        transition-all
+                                        duration-300
+                                        hover:text-white
+                                        hover:bg-white/10
+                                        hover:scale-105
+                                    "
+                                >
+                                    Contact
+                                </button>
                             </nav>
                             <div className="hidden md:flex justify-end">
-                                <button className="application-text rounded-full bg-white/90 px-4 py-1 text-sm shadow">Get Started</button>
+                                <button
+                                    onClick={() => scrollToSection(trackRef)}
+                                    className="
+                                        application-text
+                                        rounded-full
+                                        bg-white/90
+                                        px-4 py-1
+                                        text-sm
+                                        shadow
+                                        transition-all
+                                        duration-300
+                                        hover:bg-white
+                                        hover:scale-105
+                                        hover:shadow-xl
+                                        hover:-translate-y-0.5
+                                    "
+                                    >
+                                    Get Started
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -257,7 +383,7 @@ export default function Track() {
                 </div>
             </div>
 
-            <section className="track-section min-h-screen py-12">
+            <section ref={trackRef} className="track-section min-h-screen py-12">
                 <div
                     className="absolute left-0 right-0 top-0 h-px opacity-90 pointer-events-none"
                     aria-hidden="true"
@@ -293,16 +419,14 @@ export default function Track() {
                                             rounded-full
                                             bg-sky-600
                                             hover:bg-sky-700
-                                            w-13
+                                            w-13 h-13
                                             flex items-center justify-center
                                             text-white
                                             shadow-lg
                                             transition
-                                            text-2xl
-                                            font-light
                                         "
                                     >
-                                        +
+                                        <Plus size={22} strokeWidth={2.5} />
                                     </button>
                                 </div>
                             </div>
@@ -663,7 +787,7 @@ export default function Track() {
             )}
 
             <div className="footer-area">
-                <footer className="track-footer">
+                <footer ref={aboutRef} className="track-footer">
                     <div className="relative z-10 mx-auto max-w-7xl px-6">
                         <h2 className="text-6xl font-semibold ">About JobHunter</h2>
                         <p className="mt-3 w-full text-xl ">
@@ -736,7 +860,7 @@ export default function Track() {
                     </div>
                 </footer>
 
-                <div className="footer-last">
+                <div ref={contactRef} className="footer-last">
                     <div className="footer-brand flex items-center justify-center gap-4">
                         <img
                             src={JobHunterLogo}
@@ -750,6 +874,34 @@ export default function Track() {
                     </div>
                 </div>
             </div>
+
+            <button
+                onClick={scrollToTop}
+                className={`
+                    fixed
+                    bottom-8
+                    right-8
+                    z-50
+                    h-14
+                    w-14
+                    rounded-full
+                    bg-[#53B2FF]
+                    text-white
+                    shadow-xl
+                    flex
+                    items-center
+                    justify-center
+                    transition-all
+                    duration-300
+                    hover:scale-110
+                    hover:shadow-2xl
+                    ${showScrollTop
+                        ? "opacity-100 translate-y-0"
+                        : "opacity-0 translate-y-4 pointer-events-none"}
+                `}
+            >
+                <ChevronUp size={24} strokeWidth={2.5} />
+            </button>
         </>
     );
 }
