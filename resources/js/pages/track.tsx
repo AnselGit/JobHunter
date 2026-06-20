@@ -175,8 +175,30 @@ export default function Track() {
         note: '',
     });
 
+    const companyLinks = [
+        "About",
+        "Features",
+        "Contact",
+        "Privacy Policy",
+        "Terms of Service",
+    ];
 
+    const resources = [
+        "Help Center",
+        "Documentation",
+        "Career Tips",
+        "Resume Guide",
+        "FAQ",
+    ];
 
+    const contacts = [
+        "LinkedIn",
+        "GitHub",
+        "X (Twitter)",
+        "Email",
+    ];
+
+    
     return (
         <>
             <Head title="Track" />
@@ -639,40 +661,73 @@ export default function Track() {
                 </div>
             )}
 
-            <footer className="border-t border-white/20 bg-transparent py-12">
-                <div className="container mx-auto px-6 text-sky-700">
-                    <h3 className="text-xl font-semibold text-slate-800">About JobHunter</h3>
-                    <p className="mt-3 max-w-2xl text-sm text-slate-600">
-                        Turn job searching into a structured process. Keep your applications organized
-                        and never miss an opportunity.
+            <footer className="track-footer flex items-center">
+                <div className="relative z-10 container mx-auto px-6">
+                    <h2 className="text-6xl font-semibold ">About JobHunter</h2>
+                    <p className="mt-3 w-full text-xl ">
+                        Turn Job Searching Into a Structured Process
+
+                        Finding a job shouldn't feel like managing dozens of browser tabs, spreadsheets, and forgotten emails.
+                        Our platform helps job seekers organize every application, monitor interview progress, track responses, and gain insights into their job search performance all in one place.
+                        Whether you're a student applying for your first role, a fresh graduate entering the workforce, or a professional exploring new opportunities, keeping your applications organized can make the difference between missed chances and successful offers.
                     </p>
 
-                    <div className="mt-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-                        <div>
-                            <h4 className="mb-2 font-medium text-slate-700">Company</h4>
-                            <ul className="text-sm text-slate-600">
-                                <li>About</li>
-                                <li>Features</li>
-                                <li>Contact</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="mb-2 font-medium text-slate-700">Resources</h4>
-                            <ul className="text-sm text-slate-600">
-                                <li>Help Center</li>
-                                <li>Documentation</li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h4 className="mb-2 font-medium text-slate-700">Contact</h4>
-                            <ul className="text-sm text-slate-600">
-                                <li>LinkedIn</li>
-                                <li>GitHub</li>
-                            </ul>
+                    <div className="mt-8 relative left-1/2 right-1/2 mx-[-50vw] w-screen border-y border-white">
+                        <div className="mx-auto max-w-7xl">
+                            <div className="grid grid-cols-1 md:grid-cols-3">
+                                <div className="p-6 md:border-l border-white">
+                                    <h4 className="mb-3 font-medium">Company</h4>
+
+                                    <ul className="list-disc list-inside space-y-2 text-sm">
+                                        {companyLinks.map((item) => (
+                                            <li key={item}>
+                                                <a
+                                                    href="#"
+                                                    onClick={(e) => e.preventDefault()}
+                                                    className="hover:underline"
+                                                >
+                                                    {item}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="p-6 md:border-x border-white">
+                                    <h4 className="mb-3 font-medium">Resources</h4>
+                                    <ul className="list-disc list-inside space-y-2 text-sm">
+                                        {resources.map((item) => (
+                                            <li key={item}>
+                                                <a href="#" onClick={(e) => e.preventDefault()} className="hover:underline">
+                                                    {item}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+
+                                <div className="p-6 md:border-r border-white">
+                                    <h4 className="mb-3 font-medium">Contact</h4>
+                                    <ul className="list-disc list-inside space-y-2 text-sm">
+                                        {contacts.map((item) => (
+                                            <li key={item}>
+                                                <a href="#" onClick={(e) => e.preventDefault()} className="hover:underline">
+                                                    {item}
+                                                </a>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </footer>
+
+            <div className="footer-last">
+                <h1 className="text-9xl text-blue-400 font-semibold text-center">JobHunter</h1>
+            </div>
         </>
     );
 }
+

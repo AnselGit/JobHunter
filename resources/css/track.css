@@ -1,3 +1,5 @@
+/* @import "tailwindcss"; */
+
 /* Track page custom styles */
 .track-hero {
   background: linear-gradient(180deg, #51B1FF 0%, #FFFFFF 70%);
@@ -133,6 +135,75 @@
   mask-repeat: repeat;
   z-index: 0;
 }
+
+.track-footer {
+    color: white;
+    min-height: 100vh;
+    position: relative;
+    background: linear-gradient(
+        180deg,
+        #A8D8FF 0%,
+        #67BBFF 50%,
+        #FFFFFF 100%
+    );
+}
+
+.track-footer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        180deg,
+        #CCE8FF 0%,
+        #67BBFF 40%,
+        #D5ECFF 100%
+    );
+    opacity: 0.9;
+
+    -webkit-mask-image: repeating-linear-gradient(
+        180deg,
+        rgba(0,0,0,0) 0 calc(160px - 1px),
+        rgba(0,0,0,1) calc(160px - 1px) 160px
+    );
+
+    mask-image: repeating-linear-gradient(
+        180deg,
+        rgba(0,0,0,0) 0 calc(160px - 1px),
+        rgba(0,0,0,1) calc(160px - 1px) 160px
+    );
+
+    z-index: 0;
+}
+
+.track-footer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(
+        180deg,
+        #CCE8FF 0%,
+        #67BBFF 40%,
+        #D5ECFF 100%
+    );
+    opacity: 0.9;
+
+    -webkit-mask-image: repeating-linear-gradient(
+        90deg,
+        rgba(0,0,0,0) 0 calc(160px - 1px),
+        rgba(0,0,0,1) calc(160px - 1px) 160px
+    );
+
+    mask-image: repeating-linear-gradient(
+        90deg,
+        rgba(0,0,0,0) 0 calc(160px - 1px),
+        rgba(0,0,0,1) calc(160px - 1px) 160px
+    );
+
+    z-index: 0;
+}
+
 
 @keyframes fadeIn {
     from {
