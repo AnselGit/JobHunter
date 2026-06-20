@@ -1,6 +1,7 @@
 import { Head } from '@inertiajs/react';
 import { useMemo, useState, useEffect } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
+import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
 
 type Application = {
     id: number;
@@ -220,7 +221,7 @@ export default function Track() {
                                 <a className="hover:underline" href="#">Contact</a>
                             </nav>
                             <div className="hidden md:flex justify-end">
-                                <button className="rounded-full bg-white/90 px-4 py-1 text-sm text-sky-700 shadow">Get Started</button>
+                                <button className="application-text rounded-full bg-white/90 px-4 py-1 text-sm shadow">Get Started</button>
                             </div>
                         </div>
                     </div>
@@ -234,7 +235,7 @@ export default function Track() {
                             </div>
 
                             <div className="flex justify-end">
-                                <span className="italic text-sky-300 text-[clamp(36px,9vw,128px)]">
+                                <span className="italic application-text text-[clamp(36px,9vw,128px)]">
                                     Application
                                 </span>
                             </div>
@@ -248,7 +249,7 @@ export default function Track() {
                     </div>
 
                     <div className="absolute left-0 bottom-0 p-6 lg:p-12">
-                        <p className="max-w-xl text-xl text-sky-300">
+                        <p className="application-text max-w-xl text-xl text-sky-300">
                             Organize applications, monitor interview stages, track responses,
                             and never miss an opportunity again.
                         </p>
@@ -661,71 +662,93 @@ export default function Track() {
                 </div>
             )}
 
-            <footer className="track-footer flex items-center">
-                <div className="relative z-10 container mx-auto px-6">
-                    <h2 className="text-6xl font-semibold ">About JobHunter</h2>
-                    <p className="mt-3 w-full text-xl ">
-                        Turn Job Searching Into a Structured Process
+            <div className="footer-area">
+                <footer className="track-footer">
+                    <div className="relative z-10 mx-auto max-w-7xl px-6">
+                        <h2 className="text-6xl font-semibold ">About JobHunter</h2>
+                        <p className="mt-3 w-full text-xl ">
+                            Turn Job Searching Into a Structured Process
 
-                        Finding a job shouldn't feel like managing dozens of browser tabs, spreadsheets, and forgotten emails.
-                        Our platform helps job seekers organize every application, monitor interview progress, track responses, and gain insights into their job search performance all in one place.
-                        Whether you're a student applying for your first role, a fresh graduate entering the workforce, or a professional exploring new opportunities, keeping your applications organized can make the difference between missed chances and successful offers.
-                    </p>
+                            Finding a job shouldn't feel like managing dozens of browser tabs, spreadsheets, and forgotten emails.
+                            Our platform helps job seekers organize every application, monitor interview progress, track responses, and gain insights into their job search performance all in one place.
+                            Whether you're a student applying for your first role, a fresh graduate entering the workforce, or a professional exploring new opportunities, keeping your applications organized can make the difference between missed chances and successful offers.
+                        </p>
 
-                    <div className="mt-8 relative left-1/2 right-1/2 mx-[-50vw] w-screen border-y border-white">
-                        <div className="mx-auto max-w-7xl">
-                            <div className="grid grid-cols-1 md:grid-cols-3">
-                                <div className="p-6 md:border-l border-white">
-                                    <h4 className="mb-3 font-medium">Company</h4>
+                        <div className="mt-12 relative left-1/2 right-1/2 mx-[-50vw] w-screen border-y border-white">
+                            <div className="mx-auto max-w-7xl">
+                                <div className="grid grid-cols-1 md:grid-cols-3">
+                                    <div className="pl-6 pr-6 pb-12 pt-12 md:border-l border-white">
+                                        <h4 className="mb-3 font-medium">Company</h4>
 
-                                    <ul className="list-disc list-inside space-y-2 text-sm">
-                                        {companyLinks.map((item) => (
-                                            <li key={item}>
-                                                <a
-                                                    href="#"
-                                                    onClick={(e) => e.preventDefault()}
-                                                    className="hover:underline"
-                                                >
-                                                    {item}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                        <ul className="list-disc list-inside space-y-2 text-sm">
+                                            {companyLinks.map((item) => (
+                                                <li key={item}>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => e.preventDefault()}
+                                                        className="hover:underline"
+                                                    >
+                                                        {item}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
 
-                                <div className="p-6 md:border-x border-white">
-                                    <h4 className="mb-3 font-medium">Resources</h4>
-                                    <ul className="list-disc list-inside space-y-2 text-sm">
-                                        {resources.map((item) => (
-                                            <li key={item}>
-                                                <a href="#" onClick={(e) => e.preventDefault()} className="hover:underline">
-                                                    {item}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </div>
+                                    <div className="pl-6 pr-6 pb-12 pt-12 md:border-x border-white">
+                                        <h4 className="mb-3 font-medium">Resources</h4>
 
-                                <div className="p-6 md:border-r border-white">
-                                    <h4 className="mb-3 font-medium">Contact</h4>
-                                    <ul className="list-disc list-inside space-y-2 text-sm">
-                                        {contacts.map((item) => (
-                                            <li key={item}>
-                                                <a href="#" onClick={(e) => e.preventDefault()} className="hover:underline">
-                                                    {item}
-                                                </a>
-                                            </li>
-                                        ))}
-                                    </ul>
+                                        <ul className="list-disc list-inside space-y-2 text-sm">
+                                            {resources.map((item) => (
+                                                <li key={item}>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => e.preventDefault()}
+                                                        className="hover:underline"
+                                                    >
+                                                        {item}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="pl-6 pr-6 pb-12 pt-12 md:border-r border-white">
+                                        <h4 className="mb-3 font-medium">Contact</h4>
+
+                                        <ul className="list-disc list-inside space-y-2 text-sm">
+                                            {contacts.map((item) => (
+                                                <li key={item}>
+                                                    <a
+                                                        href="#"
+                                                        onClick={(e) => e.preventDefault()}
+                                                        className="hover:underline"
+                                                    >
+                                                        {item}
+                                                    </a>
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </footer>
+                </footer>
 
-            <div className="footer-last">
-                <h1 className="text-9xl text-blue-400 font-semibold text-center">JobHunter</h1>
+                <div className="footer-last">
+                    <div className="footer-brand flex items-center justify-center gap-4">
+                        <img
+                            src={JobHunterLogo}
+                            alt="JobHunter Logo"
+                            className="h-32 w-auto"
+                        />
+
+                        <h1 className="jobhunter-logo-large font-semibold">
+                            JobHunter
+                        </h1>
+                    </div>
+                </div>
             </div>
         </>
     );

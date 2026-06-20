@@ -1,145 +1,164 @@
-/* @import "tailwindcss"; */
 
-/* Track page custom styles */
+/* =========================================
+   HERO SECTION
+========================================= */
+
 .track-hero {
-  background: linear-gradient(180deg, #51B1FF 0%, #FFFFFF 70%);
-  position: relative;
-  width: 100%;
-  min-height: 100vh;
-  overflow: hidden;
-}
-
-/* large centered grid overlay - horizontal lines */
-.track-hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, #67BBFF 0%, #CCE8FF 45%, #D5ECFF 100%);
-  opacity: 0.9;
-  /* mask only the repeating horizontal lines so the gradient shows inside the lines */
-  -webkit-mask-image: repeating-linear-gradient(
-    180deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  -webkit-mask-size: 160px 160px;
-  -webkit-mask-repeat: repeat;
-  mask-image: repeating-linear-gradient(
-    180deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  mask-size: 160px 160px;
-  mask-repeat: repeat;
-  z-index: 0;
-}
-
-/* large centered grid overlay - vertical lines */
-.track-hero::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  transform: translateZ(0);
-  background: linear-gradient(180deg, #67BBFF 0%, #CCE8FF 45%, #D5ECFF 100%);
-  opacity: 0.9;
-  /* mask only the repeating vertical lines so the gradient shows inside the lines */
-  -webkit-mask-image: repeating-linear-gradient(
-    90deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  -webkit-mask-size: 160px 160px;
-  -webkit-mask-repeat: repeat;
-  mask-image: repeating-linear-gradient(
-    90deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  mask-size: 160px 160px;
-  mask-repeat: repeat;
-  z-index: 0;
-}
-
-.jobhunter-logo-large {
-  opacity: 0.06;
-}
-
-/* helper to keep hero content vertically centered while header stays at top */
-.track-hero .hero-inner {
-  /* Prefer Tailwind utilities for sizing; this is a fallback if needed. */
-  height: calc(100vh - 72px);
-}
-
-/* Keep gradient and subtle grid overlay in plain CSS; rest is handled by Tailwind utilities */
-
-/* Track section gradient that continues the hero's feel. */
-.track-section {
-  background: linear-gradient(180deg, #FFFFFF 0%, #51B1FF 70%, #A8D8FF 100%);
-  background-repeat: no-repeat;
-  background-size: cover;
-  position: relative;
-  z-index: 1;
-}
-
-/* grid overlay for track section - horizontal lines */
-.track-section::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(180deg, #CCE8FF 0%, #67BBFF 70%, #D5ECFF 100%);
-  opacity: 0.9;
-  /* mask only the repeating horizontal lines so the gradient shows inside the lines */
-  -webkit-mask-image: repeating-linear-gradient(
-    180deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  -webkit-mask-size: 160px 160px;
-  -webkit-mask-repeat: repeat;
-  mask-image: repeating-linear-gradient(
-    180deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  mask-size: 160px 160px;
-  mask-repeat: repeat;
-  z-index: 0;
-}
-
-/* grid overlay for track section - vertical lines */
-.track-section::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  transform: translateZ(0);
-  background: linear-gradient(180deg, #CCE8FF 0%, #67BBFF 70%, #D5ECFF 100%);
-  opacity: 0.9;
-  /* mask only the repeating vertical lines so the gradient shows inside the lines */
-  -webkit-mask-image: repeating-linear-gradient(
-    90deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  -webkit-mask-size: 160px 160px;
-  -webkit-mask-repeat: repeat;
-  mask-image: repeating-linear-gradient(
-    90deg,
-    rgba(0,0,0,0) 0 calc(160px - 1px),
-    rgba(0,0,0,1) calc(160px - 1px) 160px
-  );
-  mask-size: 160px 160px;
-  mask-repeat: repeat;
-  z-index: 0;
-}
-
-.track-footer {
-    color: white;
-    min-height: 100vh;
     position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+
+    background: linear-gradient(
+        180deg,
+        #51B1FF 0%,
+        #FFFFFF 70%
+    );
+}
+
+.track-hero::before,
+.track-hero::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.9;
+    z-index: 0;
+
+    background: linear-gradient(
+        180deg,
+        #67BBFF 0%,
+        #CCE8FF 45%,
+        #D5ECFF 100%
+    );
+}
+
+.track-hero::before {
+    -webkit-mask-image: repeating-linear-gradient(
+        180deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    -webkit-mask-size: 160px 160px;
+    -webkit-mask-repeat: repeat;
+
+    mask-image: repeating-linear-gradient(
+        180deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    mask-size: 160px 160px;
+    mask-repeat: repeat;
+}
+
+.track-hero::after {
+    -webkit-mask-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    -webkit-mask-size: 160px 160px;
+    -webkit-mask-repeat: repeat;
+
+    mask-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    mask-size: 160px 160px;
+    mask-repeat: repeat;
+}
+
+.track-hero .hero-inner {
+    height: calc(100vh - 72px);
+}
+
+.application-text {
+    color: #53B2FF;
+}
+
+/* =========================================
+   TRACK SECTION
+========================================= */
+
+.track-section {
+    position: relative;
+    z-index: 1;
+
+    background: linear-gradient(
+        180deg,
+        #FFFFFF 0%,
+        #51B1FF 70%,
+        #A8D8FF 100%
+    );
+
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.track-section::before,
+.track-section::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.9;
+    z-index: 0;
+
+    background: linear-gradient(
+        180deg,
+        #CCE8FF 0%,
+        #67BBFF 70%,
+        #D5ECFF 100%
+    );
+}
+
+.track-section::before {
+    -webkit-mask-image: repeating-linear-gradient(
+        180deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    -webkit-mask-size: 160px 160px;
+    -webkit-mask-repeat: repeat;
+
+    mask-image: repeating-linear-gradient(
+        180deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    mask-size: 160px 160px;
+    mask-repeat: repeat;
+}
+
+.track-section::after {
+    -webkit-mask-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    -webkit-mask-size: 160px 160px;
+    -webkit-mask-repeat: repeat;
+
+    mask-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
+    );
+    mask-size: 160px 160px;
+    mask-repeat: repeat;
+}
+
+/* =========================================
+   FOOTER AREA
+   (Footer Content + JobHunter Logo)
+========================================= */
+
+.footer-area {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+
     background: linear-gradient(
         180deg,
         #A8D8FF 0%,
@@ -148,67 +167,101 @@
     );
 }
 
-.track-footer::before {
+.footer-area::before,
+.footer-area::after {
     content: "";
     position: absolute;
     inset: 0;
     pointer-events: none;
+    opacity: 0.9;
+    z-index: 0;
+
     background: linear-gradient(
         180deg,
         #CCE8FF 0%,
         #67BBFF 40%,
         #D5ECFF 100%
     );
-    opacity: 0.9;
+}
 
+.footer-area::before {
     -webkit-mask-image: repeating-linear-gradient(
         180deg,
-        rgba(0,0,0,0) 0 calc(160px - 1px),
-        rgba(0,0,0,1) calc(160px - 1px) 160px
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
     );
+    -webkit-mask-size: 160px 160px;
+    -webkit-mask-repeat: repeat;
 
     mask-image: repeating-linear-gradient(
         180deg,
-        rgba(0,0,0,0) 0 calc(160px - 1px),
-        rgba(0,0,0,1) calc(160px - 1px) 160px
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
     );
-
-    z-index: 0;
+    mask-size: 160px 160px;
+    mask-repeat: repeat;
 }
 
-.track-footer::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: linear-gradient(
-        180deg,
-        #CCE8FF 0%,
-        #67BBFF 40%,
-        #D5ECFF 100%
-    );
-    opacity: 0.9;
-
+.footer-area::after {
     -webkit-mask-image: repeating-linear-gradient(
         90deg,
-        rgba(0,0,0,0) 0 calc(160px - 1px),
-        rgba(0,0,0,1) calc(160px - 1px) 160px
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
     );
+    -webkit-mask-size: 160px 160px;
+    -webkit-mask-repeat: repeat;
 
     mask-image: repeating-linear-gradient(
         90deg,
-        rgba(0,0,0,0) 0 calc(160px - 1px),
-        rgba(0,0,0,1) calc(160px - 1px) 160px
+        transparent 0 calc(160px - 1px),
+        black calc(160px - 1px) 160px
     );
-
-    z-index: 0;
+    mask-size: 160px 160px;
+    mask-repeat: repeat;
 }
 
+.track-footer {
+    position: relative;
+    z-index: 1;
+    color: white;
+
+    padding-top: 8rem;
+}
+
+.footer-last {
+    position: relative;
+    z-index: 1;
+
+    min-height: 40vh;
+
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+
+    padding-bottom: -1rem;
+}
+
+.jobhunter-logo-large {
+    font-size: clamp(6rem, 12vw, 12rem);
+    line-height: 0;
+    color: #53B2FF;
+    opacity: 1;
+}
+
+.footer-brand {
+    transform: scale(1.25);
+    transform-origin: bottom center;
+}
+
+/* =========================================
+   ANIMATIONS
+========================================= */
 
 @keyframes fadeIn {
     from {
         opacity: 0;
     }
+
     to {
         opacity: 1;
     }
@@ -219,6 +272,7 @@
         opacity: 0;
         transform: translateY(12px) scale(0.97);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
