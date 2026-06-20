@@ -1,3 +1,82 @@
+/* =========================================
+   THEME TOKENS
+========================================= */
+:root {
+    /* Brand blues, lightest -> darkest */
+    --color-sky-50: #D5ECFF;
+    --color-sky-100: #CCE8FF;
+    --color-sky-200: #A8D8FF;
+    --color-sky-300: #67BBFF;
+    --color-sky-400: #53B2FF;
+    --color-sky-500: #51B1FF;
+
+    /* Repeating grid-overlay pattern shared by hero/track/footer */
+    --grid-cell-size: 160px;
+    --grid-overlay-opacity: 0.9;
+}
+
+/* =========================================
+   SHARED GRID-OVERLAY PATTERN
+   .track-hero, .track-section, and .footer-area
+   each use the same masked grid on their
+   ::before (vertical lines) and ::after
+   (horizontal lines) pseudo-elements.
+   Only the gradient colors differ per section
+   (set further down, next to each section).
+========================================= */
+.track-hero::before,
+.track-hero::after,
+.track-section::before,
+.track-section::after,
+.footer-area::before,
+.footer-area::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: var(--grid-overlay-opacity);
+    z-index: 0;
+}
+
+.track-hero::before,
+.track-section::before,
+.footer-area::before {
+    -webkit-mask-image: repeating-linear-gradient(
+        180deg,
+        transparent 0 calc(var(--grid-cell-size) - 1px),
+        black calc(var(--grid-cell-size) - 1px) var(--grid-cell-size)
+    );
+    -webkit-mask-size: var(--grid-cell-size) var(--grid-cell-size);
+    -webkit-mask-repeat: repeat;
+
+    mask-image: repeating-linear-gradient(
+        180deg,
+        transparent 0 calc(var(--grid-cell-size) - 1px),
+        black calc(var(--grid-cell-size) - 1px) var(--grid-cell-size)
+    );
+    mask-size: var(--grid-cell-size) var(--grid-cell-size);
+    mask-repeat: repeat;
+}
+
+.track-hero::after,
+.track-section::after,
+.footer-area::after {
+    -webkit-mask-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(var(--grid-cell-size) - 1px),
+        black calc(var(--grid-cell-size) - 1px) var(--grid-cell-size)
+    );
+    -webkit-mask-size: var(--grid-cell-size) var(--grid-cell-size);
+    -webkit-mask-repeat: repeat;
+
+    mask-image: repeating-linear-gradient(
+        90deg,
+        transparent 0 calc(var(--grid-cell-size) - 1px),
+        black calc(var(--grid-cell-size) - 1px) var(--grid-cell-size)
+    );
+    mask-size: var(--grid-cell-size) var(--grid-cell-size);
+    mask-repeat: repeat;
+}
 
 /* =========================================
    HERO SECTION
@@ -9,64 +88,17 @@
     min-height: 100vh;
     overflow: hidden;
 
-    background: linear-gradient(
-        180deg,
-        #51B1FF 0%,
-        #FFFFFF 70%
-    );
+    background: linear-gradient(180deg, var(--color-sky-500) 0%, #FFFFFF 70%);
 }
 
 .track-hero::before,
 .track-hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.9;
-    z-index: 0;
-
     background: linear-gradient(
         180deg,
-        #67BBFF 0%,
-        #CCE8FF 45%,
-        #D5ECFF 100%
+        var(--color-sky-300) 0%,
+        var(--color-sky-100) 45%,
+        var(--color-sky-50) 100%
     );
-}
-
-.track-hero::before {
-    -webkit-mask-image: repeating-linear-gradient(
-        180deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    -webkit-mask-size: 160px 160px;
-    -webkit-mask-repeat: repeat;
-
-    mask-image: repeating-linear-gradient(
-        180deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    mask-size: 160px 160px;
-    mask-repeat: repeat;
-}
-
-.track-hero::after {
-    -webkit-mask-image: repeating-linear-gradient(
-        90deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    -webkit-mask-size: 160px 160px;
-    -webkit-mask-repeat: repeat;
-
-    mask-image: repeating-linear-gradient(
-        90deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    mask-size: 160px 160px;
-    mask-repeat: repeat;
 }
 
 .track-hero .hero-inner {
@@ -74,7 +106,7 @@
 }
 
 .application-text {
-    color: #53B2FF;
+    color: var(--color-sky-400);
 }
 
 /* =========================================
@@ -88,8 +120,8 @@
     background: linear-gradient(
         180deg,
         #FFFFFF 0%,
-        #51B1FF 70%,
-        #A8D8FF 100%
+        var(--color-sky-500) 70%,
+        var(--color-sky-200) 100%
     );
 
     background-repeat: no-repeat;
@@ -98,55 +130,12 @@
 
 .track-section::before,
 .track-section::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.9;
-    z-index: 0;
-
     background: linear-gradient(
         180deg,
-        #CCE8FF 0%,
-        #67BBFF 70%,
-        #D5ECFF 100%
+        var(--color-sky-100) 0%,
+        var(--color-sky-300) 70%,
+        var(--color-sky-50) 100%
     );
-}
-
-.track-section::before {
-    -webkit-mask-image: repeating-linear-gradient(
-        180deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    -webkit-mask-size: 160px 160px;
-    -webkit-mask-repeat: repeat;
-
-    mask-image: repeating-linear-gradient(
-        180deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    mask-size: 160px 160px;
-    mask-repeat: repeat;
-}
-
-.track-section::after {
-    -webkit-mask-image: repeating-linear-gradient(
-        90deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    -webkit-mask-size: 160px 160px;
-    -webkit-mask-repeat: repeat;
-
-    mask-image: repeating-linear-gradient(
-        90deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    mask-size: 160px 160px;
-    mask-repeat: repeat;
 }
 
 /* =========================================
@@ -161,63 +150,20 @@
 
     background: linear-gradient(
         180deg,
-        #A8D8FF 0%,
-        #67BBFF 50%,
+        var(--color-sky-200) 0%,
+        var(--color-sky-300) 50%,
         #FFFFFF 100%
     );
 }
 
 .footer-area::before,
 .footer-area::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    opacity: 0.9;
-    z-index: 0;
-
     background: linear-gradient(
         180deg,
-        #CCE8FF 0%,
-        #67BBFF 40%,
-        #D5ECFF 100%
+        var(--color-sky-100) 0%,
+        var(--color-sky-300) 40%,
+        var(--color-sky-50) 100%
     );
-}
-
-.footer-area::before {
-    -webkit-mask-image: repeating-linear-gradient(
-        180deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    -webkit-mask-size: 160px 160px;
-    -webkit-mask-repeat: repeat;
-
-    mask-image: repeating-linear-gradient(
-        180deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    mask-size: 160px 160px;
-    mask-repeat: repeat;
-}
-
-.footer-area::after {
-    -webkit-mask-image: repeating-linear-gradient(
-        90deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    -webkit-mask-size: 160px 160px;
-    -webkit-mask-repeat: repeat;
-
-    mask-image: repeating-linear-gradient(
-        90deg,
-        transparent 0 calc(160px - 1px),
-        black calc(160px - 1px) 160px
-    );
-    mask-size: 160px 160px;
-    mask-repeat: repeat;
 }
 
 .track-footer {
@@ -242,14 +188,13 @@
 }
 
 .jobhunter-logo-large {
-    font-size: clamp(6rem, 12vw, 12rem);
+    font-size: clamp(2.5rem, 14vw, 12rem);
     line-height: 0;
-    color: #53B2FF;
+    color: var(--color-sky-400);
     opacity: 1;
 }
 
 .footer-brand {
-    transform: scale(1.25);
     transform-origin: bottom center;
 }
 
@@ -258,13 +203,8 @@
 ========================================= */
 
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-    }
-
-    to {
-        opacity: 1;
-    }
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 @keyframes modalIn {
@@ -272,7 +212,6 @@
         opacity: 0;
         transform: translateY(12px) scale(0.97);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
