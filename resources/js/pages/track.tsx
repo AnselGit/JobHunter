@@ -3,7 +3,6 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
 import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
 import { Plus, ChevronUp, Menu, X } from "lucide-react";
-import { GlassScene, type Zone } from '../three/GlassScene';
 
 type Application = {
     id: number;
