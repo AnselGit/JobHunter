@@ -248,7 +248,7 @@ export default function Track() {
 
     return (
         <>
-            <Head title="Track" />
+            <Head title="JobHunter" />
 
             <div className="track-hero flex items-center relative">
                 <header className="absolute inset-x-0 top-0 z-20">
@@ -330,13 +330,13 @@ export default function Track() {
 
                 <div className="track-hero-content relative z-10 w-full px-6 lg:px-12 min-h-screen flex items-center">
                     <div className="w-full max-w-7xl mx-auto">
-                        <h1 className="leading-relaxed">
-                            <div className="text-[clamp(36px,9vw,128px)] text-white font-sans font-semibold">
+                        <h1 className="leading-tight sm:leading-relaxed">
+                            <div className="text-[2.5rem] min-[375px]:text-[3rem] min-[425px]:text-[clamp(4.5rem,9vw,8rem)] text-white font-sans font-semibold">
                                 Track <span className="font-normal">Every</span>
                             </div>
 
                             <div className="flex justify-end">
-                                <span className="italic application-text text-[clamp(36px,9vw,128px)]">
+                                <span className="italic application-text text-[2.5rem] min-[375px]:text-[3rem] min-[425px]:text-[clamp(4.5rem,9vw,8rem)]">
                                     Application
                                 </span>
                             </div>
@@ -646,7 +646,7 @@ export default function Track() {
                 <footer ref={aboutRef} className="track-footer">
                     <div className="relative z-10 mx-auto max-w-7xl px-6">
                         <h2 className="text-4xl sm:text-5xl lg:text-6xl font-semibold">About JobHunter</h2>
-                        <p className="mt-3 w-full text-base sm:text-lg lg:text-xl">
+                        <p className="mt-3 w-full text-base sm:text-lg lg:text-xl text-justify">
                             Turn Job Searching Into a Structured Process
                             <br />
                             <br />
@@ -657,8 +657,8 @@ export default function Track() {
 
                         <div className="mt-12 relative left-1/2 right-1/2 mx-[-50vw] w-screen border-y border-white">
                             <div className="mx-auto max-w-7xl">
-                                <div className="grid grid-cols-1 md:grid-cols-3">
-                                    <div className="pl-6 pr-6 pb-12 pt-12 md:border-l border-white">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 divide-y divide-white/30 sm:divide-y-0">
+                                    <div className="px-6 py-6 sm:px-4 sm:py-8 md:px-6 md:py-12 sm:border-l border-white">
                                         <h4 className="mb-3 font-medium">Company</h4>
                                         <ul className="list-disc list-inside space-y-2 text-sm">
                                             {companyLinks.map((item) => (
@@ -671,7 +671,7 @@ export default function Track() {
                                         </ul>
                                     </div>
 
-                                    <div className="pl-6 pr-6 pb-12 pt-12 md:border-x border-white">
+                                    <div className="px-6 py-6 sm:px-4 sm:py-8 md:px-6 md:py-12 sm:border-x border-white">
                                         <h4 className="mb-3 font-medium">Resources</h4>
                                         <ul className="list-disc list-inside space-y-2 text-sm">
                                             {resources.map((item) => (
@@ -684,7 +684,7 @@ export default function Track() {
                                         </ul>
                                     </div>
 
-                                    <div className="pl-6 pr-6 pb-12 pt-12 md:border-r border-white">
+                                    <div className="px-6 py-6 sm:px-4 sm:py-8 md:px-6 md:py-12 sm:border-r border-white">
                                         <h4 className="mb-3 font-medium">Contact</h4>
                                         <ul className="list-disc list-inside space-y-2 text-sm">
                                             {contacts.map((item) => (

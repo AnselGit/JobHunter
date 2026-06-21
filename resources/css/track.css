@@ -148,6 +148,8 @@
     position: relative;
     min-height: round(up, 100vh, var(--grid-cell-size));
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 
     background: linear-gradient(
         180deg,
@@ -179,18 +181,18 @@
     position: relative;
     z-index: 1;
 
-    min-height: 30vh;
+    margin-top: auto;
 
     display: flex;
     align-items: flex-end;
     justify-content: center;
 
-    padding-bottom: -1rem;
+    padding: 3rem 1rem 2.5rem;
 }
 
 .jobhunter-logo-large {
     font-size: clamp(2.5rem, 14vw, 12rem);
-    line-height: 0;
+    line-height: 1;
     color: var(--color-sky-400);
     opacity: 1;
 }
