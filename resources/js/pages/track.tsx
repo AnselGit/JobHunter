@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
 import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
 import { Plus, ChevronUp, Menu, X, Eye, EyeOff} from "lucide-react";
+import { useForm, router, usePage } from '@inertiajs/react';
 
 type Application = {
     id: number;
@@ -14,20 +15,19 @@ type Application = {
     note?: string;
 };
 
-const SAMPLE_DATA: Application[] = [
-    { id: 1, company: 'Acme Corp', location: 'Remote', salary: '$90k', dateApplied: '2026-06-01', status: 'Applied', note: 'Follow up in 2 weeks' },
-    { id: 2, company: 'Globex', location: 'New York, NY', salary: '$110k', dateApplied: '2026-05-15', status: 'Interview', note: 'Phone screen completed' },
-    { id: 3, company: 'Initech', location: 'Austin, TX', salary: '$95k', dateApplied: '2026-04-28', status: 'Offer', note: 'Offer pending' },
-    { id: 4, company: 'Umbrella', location: 'San Francisco, CA', salary: '$130k', dateApplied: '2026-03-10', status: 'Rejected', note: 'No response' },
-    { id: 5, company: 'Stark Industries', location: 'Los Angeles, CA', salary: '$140k', dateApplied: '2026-05-02', status: 'Applied', note: 'Submitted portfolio' },
-    { id: 6, company: 'Wayne Enterprises', location: 'Gotham', salary: '$120k', dateApplied: '2026-05-22', status: 'Interview', note: 'Onsite scheduled' },
-];
+interface PageProps {
+    auth: any;
+    applications: Application[];
+}
 
-export default function Track() {
+export default function Track({
+        auth,
+        applications,
+    }: PageProps) {
     // ---------- State ----------
     const [query, setQuery] = useState<string>('');
     const [logoMounted, setLogoMounted] = useState(false);
-    const [data, setData] = useState<Application[]>(SAMPLE_DATA);
+    const [data, setData] = useState<Application[]>(applications);
     const [sortBy, setSortBy] = useState<keyof Application | null>(null);
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
     const [page, setPage] = useState<number>(1);
@@ -46,12 +46,7 @@ export default function Track() {
         status: 'Applied',
         note: '',
     });
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    useEffect(() => {
-        setIsAuthenticated(
-            localStorage.getItem('jobhunter-auth') === 'true'
-        );
-    }, []);
+    const isAuthenticated = !!auth;
 
     const itemsPerPage = 10;
 
@@ -300,7 +295,6 @@ export default function Track() {
         }
 
         if (authMode === 'register') {
-
             if (!authForm.name.trim()) {
                 setAuthError('Full name is required.');
                 return;
@@ -315,21 +309,56 @@ export default function Track() {
                 setAuthError('Passwords do not match.');
                 return;
             }
+
+            router.post(
+                '/register',
+                {
+                    name: authForm.name,
+                    email: authForm.email,
+                    password: authForm.password,
+                    password_confirmation: authForm.confirmPassword,
+                },
+                {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        resetAuthForm();
+                    },
+                    onError: (errors) => {
+                        const firstError =
+                            Object.values(errors)[0];
+
+                        if (firstError) {
+                            setAuthError(String(firstError));
+                        }
+                    },
+                }
+            );
+
+            return;
         }
 
-        localStorage.setItem('jobhunter-auth', 'true');
+        router.post(
+            '/login',
+            {
+                email: authForm.email,
+                password: authForm.password,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    resetAuthForm();
+                },
+                onError: (errors) => {
+                    const firstError =
+                        Object.values(errors)[0];
 
-        setIsAuthenticated(true);
-
-        resetAuthForm();
-    };
-
-    useEffect(() => {
-        localStorage.setItem(
-            'jobhunter-auth',
-            String(isAuthenticated)
+                    if (firstError) {
+                        setAuthError(String(firstError));
+                    }
+                },
+            }
         );
-    }, [isAuthenticated]);
+    };
 
 
     return (
@@ -383,8 +412,7 @@ export default function Track() {
                                 {isAuthenticated && (
                                     <button
                                         onClick={() => {
-                                            setIsAuthenticated(false);
-                                            localStorage.removeItem('jobhunter-auth');
+                                            router.post('/logout');
                                             resetAuthForm();
                                         }}
                                         className="
