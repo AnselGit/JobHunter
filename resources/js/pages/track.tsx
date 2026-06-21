@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
 import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
 import { Plus, ChevronUp, Menu, X } from "lucide-react";
+import { GlassScene, type Zone } from '../three/GlassScene';
 
 type Application = {
     id: number;
@@ -349,7 +350,7 @@ export default function Track() {
                         </div>
 
                         {/* Stacks under the title on mobile/tablet; pins to the bottom-left corner of the hero on large screens, matching the original desktop layout */}
-                        <p className="application-text mt-6 lg:mt-0 lg:absolute lg:left-0 lg:bottom-0 lg:p-12 max-w-xl text-base sm:text-lg lg:text-xl text-sky-300">
+                        <p className="application-text mt-6 lg:mt-0 lg:absolute lg:left-0 lg:bottom-8 lg:p-12 max-w-full text-base sm:text-lg lg:text-xl text-sky-300">
                             Organize applications, monitor interview stages, track responses,
                             and never miss an opportunity again.
                         </p>
