@@ -250,7 +250,7 @@ export default function Track() {
         <>
             <Head title="Track" />
 
-            <div className="track-hero min-h-screen flex items-center relative">
+            <div className="track-hero flex items-center relative">
                 <header className="absolute inset-x-0 top-0 z-20">
                     <div className="container mx-auto px-4 sm:px-6 py-6">
                         <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
@@ -357,7 +357,7 @@ export default function Track() {
                 </div>
             </div>
 
-            <section ref={trackRef} className="track-section min-h-screen py-12">
+            <section ref={trackRef} className="track-section py-12">
                 <div
                     className="absolute left-0 right-0 top-0 h-px opacity-90 pointer-events-none"
                     aria-hidden="true"
