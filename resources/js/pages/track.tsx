@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
 import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
-import { Plus, ChevronUp, Menu, X } from "lucide-react";
+import { Plus, ChevronUp, Menu, X, Eye, EyeOff} from "lucide-react";
 
 type Application = {
     id: number;
@@ -34,6 +34,10 @@ export default function Track() {
     const [showModal, setShowModal] = useState(false);
     const [showScrollTop, setShowScrollTop] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [authError, setAuthError] = useState('');
     const [newApplication, setNewApplication] = useState({
         company: '',
         location: '',
@@ -42,6 +46,12 @@ export default function Track() {
         status: 'Applied',
         note: '',
     });
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    useEffect(() => {
+        setIsAuthenticated(
+            localStorage.getItem('jobhunter-auth') === 'true'
+        );
+    }, []);
 
     const itemsPerPage = 10;
 
@@ -81,9 +91,6 @@ export default function Track() {
 
     const statusSelectClass = (s: string) =>
         STATUS_COLORS[(s || '').toLowerCase()] ?? STATUS_COLORS.default;
-
-    const statusClass = (s: string) =>
-        `inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${statusSelectClass(s)}`;
 
     // ---------- Derived data ----------
     const filtered = useMemo(() => {
@@ -246,6 +253,85 @@ export default function Track() {
         setNewApplication((prev) => ({ ...prev, [field]: value }));
     };
 
+    // ---------- Auth ----------
+    const [authForm, setAuthForm] = useState({
+        name: '',
+        email: '',
+        password: '',
+        confirmPassword: '',
+    });
+
+    const resetAuthForm = () => {
+        setAuthForm({
+            name: '',
+            email: '',
+            password: '',
+            confirmPassword: '',
+        });
+
+        setAuthError('');
+        setShowPassword(false);
+        setShowConfirmPassword(false);
+    };
+
+    const handleAuthSubmit = () => {
+        setAuthError('');
+
+        if (!authForm.email.trim()) {
+            setAuthError('Email is required.');
+            return;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (!emailRegex.test(authForm.email)) {
+            setAuthError('Please enter a valid email address.');
+            return;
+        }
+
+        if (!authForm.password.trim()) {
+            setAuthError('Password is required.');
+            return;
+        }
+
+        if (authForm.password.length < 6) {
+            setAuthError('Password must be at least 6 characters.');
+            return;
+        }
+
+        if (authMode === 'register') {
+
+            if (!authForm.name.trim()) {
+                setAuthError('Full name is required.');
+                return;
+            }
+
+            if (!authForm.confirmPassword.trim()) {
+                setAuthError('Please confirm your password.');
+                return;
+            }
+
+            if (authForm.password !== authForm.confirmPassword) {
+                setAuthError('Passwords do not match.');
+                return;
+            }
+        }
+
+        localStorage.setItem('jobhunter-auth', 'true');
+
+        setIsAuthenticated(true);
+
+        resetAuthForm();
+    };
+
+    useEffect(() => {
+        localStorage.setItem(
+            'jobhunter-auth',
+            String(isAuthenticated)
+        );
+    }, [isAuthenticated]);
+
+
     return (
         <>
             <Head title="JobHunter" />
@@ -293,7 +379,36 @@ export default function Track() {
                                 >
                                     Get Started
                                 </button>
+
+                                {isAuthenticated && (
+                                    <button
+                                        onClick={() => {
+                                            setIsAuthenticated(false);
+                                            localStorage.removeItem('jobhunter-auth');
+                                            resetAuthForm();
+                                        }}
+                                        className="
+                                            application-text
+                                            rounded-full
+                                            bg-white/90
+                                            ml-4
+                                            px-4 py-1
+                                            text-sm
+                                            shadow
+                                            transition-all
+                                            duration-300
+                                            hover:bg-white
+                                            hover:scale-105
+                                            hover:shadow-xl
+                                            hover:-translate-y-0.5
+                                        "
+                                    >
+                                        Logout
+                                    </button>
+                                )}
                             </div>
+
+                            
 
                             {/* Mobile menu trigger — fills the same slot the desktop "Get Started" button uses */}
                             <button
@@ -365,165 +480,332 @@ export default function Track() {
                 />
 
                 <div className="track-overlay absolute inset-0 flex items-center justify-center z-30 pointer-events-auto">
-                    <div className="w-full max-w-6xl px-4 sm:px-6">
-                        <div className="mb-6 flex justify-center">
-                            <div className="w-full max-w-2xl">
-                                <div className="grid grid-cols-[1fr_auto] gap-3">
-                                    <input
-                                        value={query}
-                                        onChange={(e) => setQuery(e.target.value)}
-                                        placeholder="Search companies, locations, notes..."
-                                        className="
-                                            w-full
-                                            rounded-full
-                                            bg-white/80
-                                            backdrop-blur-sm-[2px]
-                                            border border-white/30
-                                            px-4 py-3
-                                            shadow-md
-                                            focus:outline-none
-                                            focus:ring-2
-                                            focus:ring-sky-300
-                                            transition
-                                        "
-                                    />
-                                    <button
-                                        onClick={() => setShowModal(true)}
-                                        className="
-                                            rounded-full
-                                            bg-sky-600
-                                            hover:bg-sky-700
-                                            w-12 h-12
-                                            flex items-center justify-center
-                                            text-white
-                                            shadow-lg
-                                            transition
-                                        "
-                                    >
-                                        <Plus size={22} strokeWidth={2.5} />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
 
-                        <div className="rounded-2xl bg-white/95 backdrop-blur-sm border border-slate-100 shadow-xl p-4 sm:p-6 mx-auto max-w-6xl">
-                            <div className="overflow-x-auto">
-                                <table className="min-w-180 w-full divide-y divide-slate-200">
-                                    <thead>
-                                        <tr>
-                                            {SORTABLE_COLUMNS.map(({ key, label }) => (
-                                                <th key={key} className={thClass}>
+                    <div className="w-full max-w-6xl px-4 sm:px-6">
+
+                        {!isAuthenticated ? (
+                            <div className="flex items-center justify-center min-h-150">
+                                <div className="w-full max-w-md mx-auto">
+                                    <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-xl border border-white/50 p-8">
+
+                                        {/* Toggle */}
+                                        <div className="flex rounded-full bg-slate-100 p-1 mb-6">
+                                            <button
+                                                onClick={() => {
+                                                    setAuthMode('login');
+                                                    resetAuthForm();
+                                                }}
+                                                className={`flex-1 py-2 rounded-full text-sm font-medium transition ${
+                                                    authMode === 'login'
+                                                        ? 'bg-sky-500 text-white'
+                                                        : 'text-slate-600'
+                                                }`}
+                                            >
+                                                Login
+                                            </button>
+
+                                            <button
+                                                onClick={() => {
+                                                    setAuthMode('register');
+                                                    resetAuthForm();
+                                                }}
+                                                className={`flex-1 py-2 rounded-full text-sm font-medium transition ${
+                                                    authMode === 'register'
+                                                        ? 'bg-sky-500 text-white'
+                                                        : 'text-slate-600'
+                                                }`}
+                                            >
+                                                Register
+                                            </button>
+                                        </div>
+
+                                        <h2 className="text-2xl font-semibold text-center mb-2">
+                                            {authMode === 'login'
+                                                ? 'Welcome Back'
+                                                : 'Create Account'}
+                                        </h2>
+
+                                        <p className="text-center text-slate-500 text-sm mb-6">
+                                            {authMode === 'login'
+                                                ? 'Sign in to access your application tracker.'
+                                                : 'Create an account to start tracking applications.'}
+                                        </p>
+
+                                        {authError && (
+                                            <div className="mb-4 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-600">
+                                                {authError}
+                                            </div>
+                                        )}
+
+                                        <div className="space-y-4">
+
+                                            {authMode === 'register' && (
+                                                <input
+                                                    type="text"
+                                                    placeholder="Full Name"
+                                                    value={authForm.name}
+                                                    onChange={(e) =>
+                                                        setAuthForm((prev) => ({
+                                                            ...prev,
+                                                            name: e.target.value,
+                                                        }))
+                                                    }
+                                                    className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                                                />
+                                            )}
+
+                                            <input
+                                                type="email"
+                                                placeholder="Email Address"
+                                                value={authForm.email}
+                                                onChange={(e) =>
+                                                    setAuthForm((prev) => ({
+                                                        ...prev,
+                                                        email: e.target.value,
+                                                    }))
+                                                }
+                                                className="w-full rounded-xl border border-slate-200 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                                            />
+
+                                            <div className="relative">
+                                                <input
+                                                    type={showPassword ? 'text' : 'password'}
+                                                    placeholder="Password"
+                                                    value={authForm.password}
+                                                    onChange={(e) =>
+                                                        setAuthForm((prev) => ({
+                                                            ...prev,
+                                                            password: e.target.value,
+                                                        }))
+                                                    }
+                                                    className="w-full rounded-xl border border-slate-200 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                                                />
+
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
+                                                >
+                                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                                </button>
+                                            </div>
+                                            {authMode === 'register' && (
+                                                <div className="relative">
+                                                    <input
+                                                        type={showConfirmPassword ? 'text' : 'password'}
+                                                        placeholder="Confirm Password"
+                                                        value={authForm.confirmPassword}
+                                                        onChange={(e) =>
+                                                            setAuthForm((prev) => ({
+                                                                ...prev,
+                                                                confirmPassword: e.target.value,
+                                                            }))
+                                                        }
+                                                        className="w-full rounded-xl border border-slate-200 px-4 py-3 pr-12 focus:outline-none focus:ring-2 focus:ring-sky-300"
+                                                    />
+
                                                     <button
                                                         type="button"
-                                                        onClick={() => handleSort(key)}
-                                                        className="flex items-center gap-2"
+                                                        onClick={() =>
+                                                            setShowConfirmPassword(!showConfirmPassword)
+                                                        }
+                                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500"
                                                     >
-                                                        <span>{label}</span>
-                                                        {renderSortIndicator(key)}
+                                                        {showConfirmPassword ? (
+                                                            <EyeOff size={18} />
+                                                        ) : (
+                                                            <Eye size={18} />
+                                                        )}
                                                     </button>
-                                                </th>
-                                            ))}
-                                            <th className={thClass}>Note</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="bg-white divide-y divide-slate-100">
-                                        {filtered.length > 0 ? (
-                                            paginated.map((a) => (
-                                                <tr key={a.id} className="odd:bg-white even:bg-slate-50 hover:bg-slate-100 transition-colors">
-                                                    <td className="px-3 py-3 align-top text-sm text-slate-800">
-                                                        <input
-                                                            value={a.company}
-                                                            onChange={(e) => updateField(a.id, 'company', e.target.value)}
-                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-800"
-                                                        />
-                                                    </td>
-                                                    <td className="px-3 py-3 align-top text-sm text-slate-700">
-                                                        <input
-                                                            value={a.location}
-                                                            onChange={(e) => updateField(a.id, 'location', e.target.value)}
-                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
-                                                        />
-                                                    </td>
-                                                    <td className="px-3 py-3 align-top text-sm text-slate-700">
-                                                        <input
-                                                            value={a.salary}
-                                                            onChange={(e) => updateField(a.id, 'salary', e.target.value)}
-                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
-                                                        />
-                                                    </td>
-                                                    <td className="px-3 py-3 align-top text-sm text-slate-700">
-                                                        <input
-                                                            type="date"
-                                                            value={a.dateApplied}
-                                                            onChange={(e) => updateField(a.id, 'dateApplied', e.target.value)}
-                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
-                                                        />
-                                                    </td>
-                                                    <td className="px-3 py-3 align-top text-sm">
-                                                        <select
-                                                            value={a.status}
-                                                            onChange={(e) => updateField(a.id, 'status', e.target.value)}
-                                                            className={`rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}
-                                                        >
-                                                            <option>Applied</option>
-                                                            <option>Interview</option>
-                                                            <option>Offer</option>
-                                                            <option>Rejected</option>
-                                                        </select>
-                                                    </td>
-                                                    <td className="px-3 py-3 align-top text-sm text-slate-500">
-                                                        <input
-                                                            value={a.note || ''}
-                                                            onChange={(e) => updateField(a.id, 'note', e.target.value)}
-                                                            className="w-full bg-transparent focus:outline-none text-sm text-slate-500"
-                                                        />
-                                                    </td>
+                                                </div>
+                                            )}
+
+                                            <button
+                                                onClick={handleAuthSubmit}
+                                                className="
+                                                    w-full
+                                                    rounded-xl
+                                                    bg-sky-500
+                                                    hover:bg-sky-600
+                                                    text-white
+                                                    py-3
+                                                    font-medium
+                                                    transition-all
+                                                    duration-300
+                                                    hover:scale-[1.02]
+                                                "
+                                            >
+                                                {authMode === 'login'
+                                                    ? 'Login'
+                                                    : 'Create Account'}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="mb-6 flex justify-center">
+                                    <div className="w-full max-w-2xl">
+                                        <div className="grid grid-cols-[1fr_auto] gap-3">
+                                            <input
+                                                value={query}
+                                                onChange={(e) => setQuery(e.target.value)}
+                                                placeholder="Search companies, locations, notes..."
+                                                className="
+                                                    w-full
+                                                    rounded-full
+                                                    bg-white/80
+                                                    backdrop-blur-sm-[2px]
+                                                    border border-white/30
+                                                    px-4 py-3
+                                                    shadow-md
+                                                    focus:outline-none
+                                                    focus:ring-2
+                                                    focus:ring-sky-300
+                                                    transition
+                                                "
+                                            />
+                                            <button
+                                                onClick={() => setShowModal(true)}
+                                                className="
+                                                    rounded-full
+                                                    bg-sky-600
+                                                    hover:bg-sky-700
+                                                    w-12 h-12
+                                                    flex items-center justify-center
+                                                    text-white
+                                                    shadow-lg
+                                                    transition
+                                                "
+                                            >
+                                                <Plus size={22} strokeWidth={2.5} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-2xl bg-white/95 backdrop-blur-sm border border-slate-100 shadow-xl p-4 sm:p-6 mx-auto max-w-6xl">
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-180 w-full divide-y divide-slate-200">
+                                            <thead>
+                                                <tr>
+                                                    {SORTABLE_COLUMNS.map(({ key, label }) => (
+                                                        <th key={key} className={thClass}>
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleSort(key)}
+                                                                className="flex items-center gap-2"
+                                                            >
+                                                                <span>{label}</span>
+                                                                {renderSortIndicator(key)}
+                                                            </button>
+                                                        </th>
+                                                    ))}
+                                                    <th className={thClass}>Note</th>
                                                 </tr>
-                                            ))
-                                        ) : (
-                                            <tr>
-                                                <td colSpan={6} className="py-10 text-center text-slate-400">No results found</td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                            </div>
+                                            </thead>
+                                            <tbody className="bg-white divide-y divide-slate-100">
+                                                {filtered.length > 0 ? (
+                                                    paginated.map((a) => (
+                                                        <tr key={a.id} className="odd:bg-white even:bg-slate-50 hover:bg-slate-100 transition-colors">
+                                                            <td className="px-3 py-3 align-top text-sm text-slate-800">
+                                                                <input
+                                                                    value={a.company}
+                                                                    onChange={(e) => updateField(a.id, 'company', e.target.value)}
+                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-800"
+                                                                />
+                                                            </td>
+                                                            <td className="px-3 py-3 align-top text-sm text-slate-700">
+                                                                <input
+                                                                    value={a.location}
+                                                                    onChange={(e) => updateField(a.id, 'location', e.target.value)}
+                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
+                                                                />
+                                                            </td>
+                                                            <td className="px-3 py-3 align-top text-sm text-slate-700">
+                                                                <input
+                                                                    value={a.salary}
+                                                                    onChange={(e) => updateField(a.id, 'salary', e.target.value)}
+                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
+                                                                />
+                                                            </td>
+                                                            <td className="px-3 py-3 align-top text-sm text-slate-700">
+                                                                <input
+                                                                    type="date"
+                                                                    value={a.dateApplied}
+                                                                    onChange={(e) => updateField(a.id, 'dateApplied', e.target.value)}
+                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
+                                                                />
+                                                            </td>
+                                                            <td className="px-3 py-3 align-top text-sm">
+                                                                <select
+                                                                    value={a.status}
+                                                                    onChange={(e) => updateField(a.id, 'status', e.target.value)}
+                                                                    className={`rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}
+                                                                >
+                                                                    <option>Applied</option>
+                                                                    <option>Interview</option>
+                                                                    <option>Offer</option>
+                                                                    <option>Rejected</option>
+                                                                </select>
+                                                            </td>
+                                                            <td className="px-3 py-3 align-top text-sm text-slate-500">
+                                                                <input
+                                                                    value={a.note || ''}
+                                                                    onChange={(e) => updateField(a.id, 'note', e.target.value)}
+                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-500"
+                                                                />
+                                                            </td>
+                                                        </tr>
+                                                    ))
+                                                ) : (
+                                                    <tr>
+                                                        <td colSpan={6} className="py-10 text-center text-slate-400">No results found</td>
+                                                    </tr>
+                                                )}
+                                            </tbody>
+                                        </table>
+                                    </div>
 
-                            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-slate-600">
-                                <div>
-                                    Showing {startIndex === 0 ? 0 : startIndex} - {endIndex} of {filtered.length}
+                                    <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between text-sm text-slate-600">
+                                        <div>
+                                            Showing {startIndex === 0 ? 0 : startIndex} - {endIndex} of {filtered.length}
+                                        </div>
+
+                                        <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
+                                            <button
+                                                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                                                disabled={page <= 1}
+                                                className={`shrink-0 px-3 py-1 rounded ${page <= 1 ? 'text-slate-400' : 'text-slate-700 hover:bg-slate-100'}`}
+                                            >
+                                                Prev
+                                            </button>
+
+                                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                                                <button
+                                                    key={p}
+                                                    onClick={() => setPage(p)}
+                                                    className={`shrink-0 px-3 py-1 rounded ${p === page ? 'bg-sky-600 text-white' : 'text-slate-700 hover:bg-slate-100'}`}
+                                                >
+                                                    {p}
+                                                </button>
+                                            ))}
+
+                                            <button
+                                                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                                                disabled={page >= totalPages}
+                                                className={`shrink-0 px-3 py-1 rounded ${page >= totalPages ? 'text-slate-400' : 'text-slate-700 hover:bg-slate-100'}`}
+                                            >
+                                                Next
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-
-                                <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
-                                    <button
-                                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                                        disabled={page <= 1}
-                                        className={`shrink-0 px-3 py-1 rounded ${page <= 1 ? 'text-slate-400' : 'text-slate-700 hover:bg-slate-100'}`}
-                                    >
-                                        Prev
-                                    </button>
-
-                                    {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
-                                        <button
-                                            key={p}
-                                            onClick={() => setPage(p)}
-                                            className={`shrink-0 px-3 py-1 rounded ${p === page ? 'bg-sky-600 text-white' : 'text-slate-700 hover:bg-slate-100'}`}
-                                        >
-                                            {p}
-                                        </button>
-                                    ))}
-
-                                    <button
-                                        onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                                        disabled={page >= totalPages}
-                                        className={`shrink-0 px-3 py-1 rounded ${page >= totalPages ? 'text-slate-400' : 'text-slate-700 hover:bg-slate-100'}`}
-                                    >
-                                        Next
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
+                            </>
+                        )}
                     </div>
+
                 </div>
             </section>
 
