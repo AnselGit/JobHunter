@@ -24,15 +24,23 @@ return new class extends Migration
             $table->date('date_applied')->nullable();
 
             $table->enum('status', [
-                'Applied',
-                'Interview',
-                'Offer',
-                'Rejected'
-            ])->default('Applied');
+                'applied',
+                'interview',
+                'offer',
+                'rejected'
+            ])->default('applied');
 
             $table->text('note')->nullable();
 
             $table->timestamps();
         });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('applications');
     }
 };

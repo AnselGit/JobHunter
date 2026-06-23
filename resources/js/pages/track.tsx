@@ -25,6 +25,10 @@ export default function Track({
         applications,
     }: PageProps) {
     // ---------- State ----------
+    const [isSaving, setIsSaving] = useState(false);
+    const [editForm, setEditForm] = useState<Application | null>(null);
+    const [editingApplication, setEditingApplication] = useState<Application | null>(null);
+    const [showEditModal, setShowEditModal] = useState(false);
     const [query, setQuery] = useState<string>('');
     const [logoMounted, setLogoMounted] = useState(false);
     const [data, setData] = useState<Application[]>(applications);
@@ -160,30 +164,33 @@ export default function Track({
         setPage(1);
     };
 
-    const updateField = (id: number, field: Exclude<keyof Application, 'id'>, value: string) => {
-        setData((prev) => prev.map((a) => (a.id === id ? ({ ...a, [field]: value } as Application) : a)));
-    };
-
     const addApplication = () => {
         if (!newApplication.company.trim()) return;
 
-        const application: Application = {
-            id: Date.now(),
-            ...newApplication,
-        };
+        router.post(
+            '/applications',
+            newApplication,
+            {
+                preserveScroll: true,
 
-        setData((prev) => [application, ...prev]);
+                onSuccess: () => {
+                    setNewApplication({
+                        company: '',
+                        location: '',
+                        salary: '',
+                        dateApplied: '',
+                        status: 'Applied',
+                        note: '',
+                    });
 
-        setNewApplication({
-            company: '',
-            location: '',
-            salary: '',
-            dateApplied: '',
-            status: 'Applied',
-            note: '',
-        });
+                    setShowModal(false);
 
-        setShowModal(false);
+                    router.reload({
+                        only: ['applications'],
+                    });
+                },
+            }
+        );
     };
 
     // ---------- Scroll utilities ----------
@@ -387,6 +394,28 @@ export default function Track({
             window.removeEventListener('scroll', updateProgressColor);
     }, []);
 
+    // table crud
+
+    const updateEditField = (field: keyof Application, value: string) => {
+        if (!editForm) return;
+
+        setEditForm({
+            ...editForm,
+            [field]: value,
+        });
+    };
+
+    const [toast, setToast] = useState<{
+        type: 'success' | 'error';
+        message: string;
+    } | null>(null);
+
+    useEffect(() => {
+        if (!toast) return;
+
+        const t = setTimeout(() => setToast(null), 2500);
+        return () => clearTimeout(t);
+    }, [toast]);
 
     return (
         <>
@@ -764,60 +793,58 @@ export default function Track({
                                                         </th>
                                                     ))}
                                                     <th className={thClass}>Note</th>
+                                                    <th className={thClass}>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-slate-100">
                                                 {filtered.length > 0 ? (
                                                     paginated.map((a) => (
                                                         <tr key={a.id} className="odd:bg-white even:bg-slate-50 hover:bg-slate-100 transition-colors">
+
+                                                            {/* Company */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-800">
-                                                                <input
-                                                                    value={a.company}
-                                                                    onChange={(e) => updateField(a.id, 'company', e.target.value)}
-                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-800"
-                                                                />
+                                                                {a.company}
                                                             </td>
+
+                                                            {/* Location */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-700">
-                                                                <input
-                                                                    value={a.location}
-                                                                    onChange={(e) => updateField(a.id, 'location', e.target.value)}
-                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
-                                                                />
+                                                                {a.location}
                                                             </td>
+
+                                                            {/* Salary */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-700">
-                                                                <input
-                                                                    value={a.salary}
-                                                                    onChange={(e) => updateField(a.id, 'salary', e.target.value)}
-                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
-                                                                />
+                                                                {a.salary}
                                                             </td>
+
+                                                            {/* Date Applied */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-700">
-                                                                <input
-                                                                    type="date"
-                                                                    value={a.dateApplied}
-                                                                    onChange={(e) => updateField(a.id, 'dateApplied', e.target.value)}
-                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-700"
-                                                                />
+                                                                {a.dateApplied}
                                                             </td>
+
+                                                            {/* Status */}
                                                             <td className="px-3 py-3 align-top text-sm">
-                                                                <select
-                                                                    value={a.status}
-                                                                    onChange={(e) => updateField(a.id, 'status', e.target.value)}
-                                                                    className={`rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}
-                                                                >
-                                                                    <option>Applied</option>
-                                                                    <option>Interview</option>
-                                                                    <option>Offer</option>
-                                                                    <option>Rejected</option>
-                                                                </select>
+                                                                <span className={`inline-flex rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}>
+                                                                    {a.status}
+                                                                </span>
                                                             </td>
+
+                                                            {/* Note */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-500">
-                                                                <input
-                                                                    value={a.note || ''}
-                                                                    onChange={(e) => updateField(a.id, 'note', e.target.value)}
-                                                                    className="w-full bg-transparent focus:outline-none text-sm text-slate-500"
-                                                                />
+                                                                {a.note || '-'}
                                                             </td>
+
+                                                            <td className="px-3 py-3 align-top text-sm">
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setEditForm({ ...a });
+                                                                        setShowEditModal(true);
+                                                                    }}
+                                                                    className="text-sky-600 hover:text-sky-800 font-medium"
+                                                                >
+                                                                    Edit
+                                                                </button>
+                                                            </td>
+
                                                         </tr>
                                                     ))
                                                 ) : (
@@ -871,13 +898,18 @@ export default function Track({
             </section>
 
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 backdrop-blur-sm p-4 animate-fadeIn">
-                    <div className="w-full max-w-lg max-h-[90vh] flex flex-col bg-white rounded-2xl shadow-xl border border-slate-200 overflow-hidden animate-modalIn">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+                    <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
+
                         {/* Header */}
                         <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
                             <div>
-                                <h2 className="text-lg font-semibold text-slate-900">Add Application</h2>
-                                <p className="text-xs text-slate-500">Track your next opportunity</p>
+                                <h2 className="text-lg font-semibold text-slate-800">
+                                    Add Application
+                                </h2>
+                                <p className="text-xs text-slate-500">
+                                    Track your next opportunity
+                                </p>
                             </div>
 
                             <button
@@ -888,78 +920,98 @@ export default function Track({
                             </button>
                         </div>
 
-                        {/* Body — scrolls internally if the modal is taller than the viewport */}
+                        {/* Body */}
                         <div className="p-5 space-y-4 overflow-y-auto flex-1 min-h-0">
+
+                            {/* Company */}
                             <div>
-                                <label className="block text-xs font-medium text-slate-600 mb-1">Company</label>
+                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                    Company
+                                </label>
                                 <input
                                     value={newApplication.company}
-                                    onChange={(e) => updateNewApplicationField('company', e.target.value)}
-                                    className="
-                                        w-full
-                                        rounded-lg
-                                        border border-slate-200
-                                        px-3 py-2.5
-                                        focus:ring-2
-                                        focus:ring-sky-500
-                                        focus:border-sky-500
-                                        outline-none
-                                    "
+                                    onChange={(e) =>
+                                        updateNewApplicationField('company', e.target.value)
+                                    }
+                                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
                                 />
                             </div>
 
+                            {/* Location + Salary */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">Location</label>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Location
+                                    </label>
                                     <input
                                         value={newApplication.location}
-                                        onChange={(e) => updateNewApplicationField('location', e.target.value)}
+                                        onChange={(e) =>
+                                            updateNewApplicationField('location', e.target.value)
+                                        }
                                         className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">Salary</label>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Salary
+                                    </label>
                                     <input
                                         value={newApplication.salary}
-                                        onChange={(e) => updateNewApplicationField('salary', e.target.value)}
+                                        onChange={(e) =>
+                                            updateNewApplicationField('salary', e.target.value)
+                                        }
                                         className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     />
                                 </div>
                             </div>
 
+                            {/* Date + Status */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">Applied</label>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Applied
+                                    </label>
                                     <input
                                         type="date"
                                         value={newApplication.dateApplied}
-                                        onChange={(e) => updateNewApplicationField('dateApplied', e.target.value)}
+                                        onChange={(e) =>
+                                            updateNewApplicationField('dateApplied', e.target.value)
+                                        }
                                         className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     />
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">Status</label>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Status
+                                    </label>
                                     <select
                                         value={newApplication.status}
-                                        onChange={(e) => updateNewApplicationField('status', e.target.value)}
+                                        onChange={(e) =>
+                                            updateNewApplicationField('status', e.target.value)
+                                        }
                                         className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
                                     >
-                                        <option>Applied</option>
-                                        <option>Interview</option>
-                                        <option>Offer</option>
-                                        <option>Rejected</option>
+                                        <option value="Applied">Applied</option>
+                                        <option value="Interview">Interview</option>
+                                        <option value="Offer">Offer</option>
+                                        <option value="Rejected">Rejected</option>
                                     </select>
                                 </div>
                             </div>
 
+                            {/* Notes */}
                             <div>
-                                <label className="block text-xs font-medium text-slate-600 mb-1">Notes</label>
+                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                    Notes
+                                </label>
                                 <textarea
                                     rows={3}
                                     value={newApplication.note}
-                                    onChange={(e) => updateNewApplicationField('note', e.target.value)}
+                                    onChange={(e) =>
+                                        updateNewApplicationField('note', e.target.value)
+                                    }
                                     className="w-full rounded-lg border border-slate-200 px-3 py-2.5 resize-none"
                                 />
                             </div>
@@ -981,6 +1033,136 @@ export default function Track({
                                 Add
                             </button>
                         </div>
+
+                    </div>
+                </div>
+            )}
+
+            {showEditModal && editForm && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden">
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-5 py-4 border-b">
+                            <h2 className="text-lg font-semibold">Edit Application</h2>
+
+                            <button
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                    setEditForm(null);
+                                }}
+                                className="text-slate-500 hover:text-black"
+                            >
+                                ✕
+                            </button>
+                        </div>
+
+                        {/* Body */}
+                        <div className="p-5 space-y-4">
+
+                            <input
+                                value={editForm.company}
+                                onChange={(e) => updateEditField('company', e.target.value)}
+                                placeholder="Company"
+                                className="w-full border rounded-lg px-3 py-2"
+                            />
+
+                            <input
+                                value={editForm.location}
+                                onChange={(e) => updateEditField('location', e.target.value)}
+                                placeholder="Location"
+                                className="w-full border rounded-lg px-3 py-2"
+                            />
+
+                            <input
+                                value={editForm.salary}
+                                onChange={(e) => updateEditField('salary', e.target.value)}
+                                placeholder="Salary"
+                                className="w-full border rounded-lg px-3 py-2"
+                            />
+
+                            <input
+                                type="date"
+                                value={editForm.dateApplied}
+                                onChange={(e) => updateEditField('dateApplied', e.target.value)}
+                                className="w-full border rounded-lg px-3 py-2"
+                            />
+
+                            <select
+                                value={editForm.status}
+                                onChange={(e) => updateEditField('status', e.target.value)}
+                                className="w-full border rounded-lg px-3 py-2"
+                            >
+                                <option>Applied</option>
+                                <option>Interview</option>
+                                <option>Offer</option>
+                                <option>Rejected</option>
+                            </select>
+
+                            <textarea
+                                value={editForm.note || ''}
+                                onChange={(e) => updateEditField('note', e.target.value)}
+                                className="w-full border rounded-lg px-3 py-2"
+                                rows={3}
+                                placeholder="Notes"
+                            />
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex justify-end gap-2 px-5 py-4 border-t">
+
+                            <button
+                                onClick={() => {
+                                    setShowEditModal(false);
+                                    setEditForm(null);
+                                }}
+                                className="px-4 py-2 rounded-full border"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                disabled={isSaving}
+                                onClick={() => {
+                                    if (!editForm) return;
+
+                                    router.patch(`/applications/${editForm.id}`, {
+                                        ...editForm,
+                                        date_applied: editForm.dateApplied,
+                                        status: editForm.status.toLowerCase(),
+                                    }, {
+                                        preserveScroll: true,
+
+                                        onStart: () => setIsSaving(true),
+                                        onFinish: () => setIsSaving(false),
+
+                                        onSuccess: () => {
+                                            setShowEditModal(false);
+                                            setEditForm(null);
+
+                                            setToast({
+                                                type: 'success',
+                                                message: 'Application updated successfully',
+                                            });
+                                        },
+
+                                        onError: () => {
+                                            setToast({
+                                                type: 'error',
+                                                message: 'Failed to update application',
+                                            });
+                                        },
+                                    });
+                                }}
+                                className={`
+                                    px-4 py-2 rounded-full text-white transition
+                                    ${isSaving ? 'bg-sky-300 cursor-not-allowed' : 'bg-sky-600 hover:bg-sky-700'}
+                                `}
+                            >
+                                {isSaving ? 'Saving...' : 'Save'}
+                            </button>
+                        </div>
+
                     </div>
                 </div>
             )}
@@ -1084,6 +1266,18 @@ export default function Track({
             >
                 <ChevronUp size={24} strokeWidth={2.5} />
             </button>
+
+            {toast && (
+                <div
+                    className={`
+                        fixed bottom-6 left-1/2 -translate-x-1/2 z-50
+                        px-4 py-3 rounded-xl shadow-lg text-white
+                        ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}
+                    `}
+                >
+                    {toast.message}
+                </div>
+            )}
         </>
     );
 }

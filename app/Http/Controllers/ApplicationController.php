@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Application;
 use Illuminate\Http\Request;
 
 class ApplicationController extends Controller
@@ -22,8 +23,29 @@ class ApplicationController extends Controller
             'location' => $validated['location'] ?? null,
             'salary' => $validated['salary'] ?? null,
             'date_applied' => $validated['dateApplied'] ?? null,
-            'status' => $validated['status'],
+
+            'status' => strtolower($validated['status']),
+
             'note' => $validated['note'] ?? null,
+        ]);
+
+        return back();
+    }
+
+    public function update(Request $request, $id)
+    {
+        $application = Application::findOrFail($id);
+
+        $application->update([
+            'company' => $request->company,
+            'location' => $request->location,
+            'salary' => $request->salary,
+
+            'date_applied' => $request->date_applied ?? $request->dateApplied,
+
+            'status' => strtolower($request->status),
+
+            'note' => $request->note,
         ]);
 
         return back();

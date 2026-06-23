@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Models\Application;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ApplicationController;
+
 
 Route::get('/', function () {
     return Inertia::render('track', [
@@ -14,6 +16,17 @@ Route::get('/', function () {
             ? Application::where('user_id', Auth::id())
                 ->latest()
                 ->get()
+                ->map(function ($a) {
+                    return [
+                        'id' => $a->id,
+                        'company' => $a->company,
+                        'location' => $a->location,
+                        'salary' => $a->salary,
+                        'dateApplied' => $a->date_applied, // 👈 normalize here
+                        'status' => $a->status,
+                        'note' => $a->note,
+                    ];
+                })
             : [],
     ]);
 });
@@ -22,3 +35,9 @@ Route::get('/', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/logout', [AuthController::class, 'logout']);
+
+// Crud
+Route::middleware('auth')->group(function () {
+    Route::post('/applications', [ApplicationController::class, 'store']);
+    Route::patch('/applications/{id}', [ApplicationController::class, 'update']);
+});
