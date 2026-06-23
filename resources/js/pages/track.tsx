@@ -19,7 +19,7 @@ export default function Track({ auth, applications, }: PageProps) {
     const app = useApplications(applications);
     const authHook = useAuth();
     const scroll = useScroll();
-    const isAuthenticated = !!auth?.user;
+    const isAuthenticated = !!auth?.id;
 
     const navButtonClass = "hover:text-white/100 text-white/80 transition hover:scale-105";
     const thClass = "px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase";
