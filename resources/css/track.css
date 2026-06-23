@@ -232,3 +232,13 @@
 html {
     scroll-behavior: smooth;
 }
+
+#nprogress .bar {
+    background: var(--progress-color, #53B2FF) !important;
+}
+
+#nprogress .peg {
+    box-shadow:
+        0 0 10px var(--progress-color, #53B2FF),
+        0 0 5px var(--progress-color, #53B2FF) !important;
+}

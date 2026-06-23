@@ -360,6 +360,33 @@ export default function Track({
         );
     };
 
+    useEffect(() => {
+        const updateProgressColor = () => {
+            const hero = document.querySelector('.track-hero');
+            const track = document.querySelector('.track-section');
+
+            const y = window.scrollY;
+
+            if (y < (hero?.clientHeight ?? 0)) {
+                document.documentElement.style.setProperty(
+                    '--progress-color',
+                    '#FFFFFF'
+                );
+            } else {
+                document.documentElement.style.setProperty(
+                    '--progress-color',
+                    'var(--color-sky-400)'
+                );
+            }
+        };
+
+        updateProgressColor();
+        window.addEventListener('scroll', updateProgressColor);
+
+        return () =>
+            window.removeEventListener('scroll', updateProgressColor);
+    }, []);
+
 
     return (
         <>
@@ -565,7 +592,13 @@ export default function Track({
                                             </div>
                                         )}
 
-                                        <div className="space-y-4">
+                                        <form
+                                            onSubmit={(e) => {
+                                                e.preventDefault();
+                                                handleAuthSubmit();
+                                            }}
+                                            className="space-y-4"
+                                        >
 
                                             {authMode === 'register' && (
                                                 <input
@@ -649,7 +682,7 @@ export default function Track({
                                             )}
 
                                             <button
-                                                onClick={handleAuthSubmit}
+                                                type="submit"
                                                 className="
                                                     w-full
                                                     rounded-xl
@@ -667,7 +700,7 @@ export default function Track({
                                                     ? 'Login'
                                                     : 'Create Account'}
                                             </button>
-                                        </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
