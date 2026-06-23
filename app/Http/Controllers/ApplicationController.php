@@ -50,4 +50,12 @@ class ApplicationController extends Controller
 
         return back();
     }
+
+    public function destroy($id)
+    {
+        $application = Application::findOrFail($id);
+        $application->delete();
+
+        return back();
+    }
 }

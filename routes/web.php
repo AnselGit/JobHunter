@@ -22,7 +22,7 @@ Route::get('/', function () {
                         'company' => $a->company,
                         'location' => $a->location,
                         'salary' => $a->salary,
-                        'dateApplied' => $a->date_applied, // 👈 normalize here
+                        'dateApplied' => $a->date_applied,
                         'status' => $a->status,
                         'note' => $a->note,
                     ];
@@ -40,4 +40,5 @@ Route::post('/logout', [AuthController::class, 'logout']);
 Route::middleware('auth')->group(function () {
     Route::post('/applications', [ApplicationController::class, 'store']);
     Route::patch('/applications/{id}', [ApplicationController::class, 'update']);
+    Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
 });

@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
 import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
-import { Plus, ChevronUp, Menu, X, Eye, EyeOff} from "lucide-react";
+import { Plus, ChevronUp, Menu, X, Eye, EyeOff, Pencil, Trash2} from "lucide-react";
 import { useForm, router, usePage } from '@inertiajs/react';
 
 type Application = {
@@ -24,7 +24,8 @@ export default function Track({
         auth,
         applications,
     }: PageProps) {
-    // ---------- State ----------
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
     const [isSaving, setIsSaving] = useState(false);
     const [editForm, setEditForm] = useState<Application | null>(null);
     const [editingApplication, setEditingApplication] = useState<Application | null>(null);
@@ -834,15 +835,31 @@ export default function Track({
                                                             </td>
 
                                                             <td className="px-3 py-3 align-top text-sm">
-                                                                <button
-                                                                    onClick={() => {
-                                                                        setEditForm({ ...a });
-                                                                        setShowEditModal(true);
-                                                                    }}
-                                                                    className="text-sky-600 hover:text-sky-800 font-medium"
-                                                                >
-                                                                    Edit
-                                                                </button>
+                                                                <div className="flex items-center gap-3">
+
+                                                                    {/* Edit */}
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setEditForm({ ...a });
+                                                                            setShowEditModal(true);
+                                                                        }}
+                                                                        className="text-sky-600 hover:text-sky-800 transition"
+                                                                    >
+                                                                        <Pencil size={18} />
+                                                                    </button>
+
+                                                                    {/* Delete */}
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            setDeleteTarget(a);
+                                                                            setShowDeleteModal(true);
+                                                                        }}
+                                                                        className="text-red-500 hover:text-red-700 transition"
+                                                                    >
+                                                                        <Trash2 size={18} />
+                                                                    </button>
+
+                                                                </div>
                                                             </td>
 
                                                         </tr>
@@ -1039,84 +1056,141 @@ export default function Track({
             )}
 
             {showEditModal && editForm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4 animate-fadeIn">
+
+                    <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col animate-modalIn">
 
                         {/* Header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b">
-                            <h2 className="text-lg font-semibold">Edit Application</h2>
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                            <div>
+                                <h2 className="text-lg font-semibold text-slate-800">
+                                    Edit Application
+                                </h2>
+                                <p className="text-xs text-slate-500">
+                                    Update your application details
+                                </p>
+                            </div>
 
                             <button
                                 onClick={() => {
                                     setShowEditModal(false);
                                     setEditForm(null);
                                 }}
-                                className="text-slate-500 hover:text-black"
+                                className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100"
                             >
                                 ✕
                             </button>
                         </div>
 
                         {/* Body */}
-                        <div className="p-5 space-y-4">
+                        <div className="p-5 space-y-4 overflow-y-auto flex-1 min-h-0">
 
-                            <input
-                                value={editForm.company}
-                                onChange={(e) => updateEditField('company', e.target.value)}
-                                placeholder="Company"
-                                className="w-full border rounded-lg px-3 py-2"
-                            />
+                            {/* Company */}
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                    Company
+                                </label>
+                                <input
+                                    value={editForm.company}
+                                    onChange={(e) =>
+                                        updateEditField('company', e.target.value)
+                                    }
+                                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
+                                />
+                            </div>
 
-                            <input
-                                value={editForm.location}
-                                onChange={(e) => updateEditField('location', e.target.value)}
-                                placeholder="Location"
-                                className="w-full border rounded-lg px-3 py-2"
-                            />
+                            {/* Location + Salary */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                            <input
-                                value={editForm.salary}
-                                onChange={(e) => updateEditField('salary', e.target.value)}
-                                placeholder="Salary"
-                                className="w-full border rounded-lg px-3 py-2"
-                            />
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Location
+                                    </label>
+                                    <input
+                                        value={editForm.location}
+                                        onChange={(e) =>
+                                            updateEditField('location', e.target.value)
+                                        }
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
+                                    />
+                                </div>
 
-                            <input
-                                type="date"
-                                value={editForm.dateApplied}
-                                onChange={(e) => updateEditField('dateApplied', e.target.value)}
-                                className="w-full border rounded-lg px-3 py-2"
-                            />
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Salary
+                                    </label>
+                                    <input
+                                        value={editForm.salary}
+                                        onChange={(e) =>
+                                            updateEditField('salary', e.target.value)
+                                        }
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
+                                    />
+                                </div>
+                            </div>
 
-                            <select
-                                value={editForm.status}
-                                onChange={(e) => updateEditField('status', e.target.value)}
-                                className="w-full border rounded-lg px-3 py-2"
-                            >
-                                <option>Applied</option>
-                                <option>Interview</option>
-                                <option>Offer</option>
-                                <option>Rejected</option>
-                            </select>
+                            {/* Date + Status */}
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
 
-                            <textarea
-                                value={editForm.note || ''}
-                                onChange={(e) => updateEditField('note', e.target.value)}
-                                className="w-full border rounded-lg px-3 py-2"
-                                rows={3}
-                                placeholder="Notes"
-                            />
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Applied
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={editForm.dateApplied}
+                                        onChange={(e) =>
+                                            updateEditField('dateApplied', e.target.value)
+                                        }
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-xs font-medium text-slate-600 mb-1">
+                                        Status
+                                    </label>
+                                    <select
+                                        value={editForm.status}
+                                        onChange={(e) =>
+                                            updateEditField('status', e.target.value)
+                                        }
+                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
+                                    >
+                                        <option>Applied</option>
+                                        <option>Interview</option>
+                                        <option>Offer</option>
+                                        <option>Rejected</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Notes */}
+                            <div>
+                                <label className="block text-xs font-medium text-slate-600 mb-1">
+                                    Notes
+                                </label>
+                                <textarea
+                                    rows={3}
+                                    value={editForm.note || ''}
+                                    onChange={(e) =>
+                                        updateEditField('note', e.target.value)
+                                    }
+                                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 resize-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
+                                />
+                            </div>
+
                         </div>
 
                         {/* Footer */}
-                        <div className="flex justify-end gap-2 px-5 py-4 border-t">
+                        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-100">
 
                             <button
                                 onClick={() => {
                                     setShowEditModal(false);
                                     setEditForm(null);
                                 }}
-                                className="px-4 py-2 rounded-full border"
+                                className="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition"
                             >
                                 Cancel
                             </button>
@@ -1154,15 +1228,104 @@ export default function Track({
                                         },
                                     });
                                 }}
-                                className={`
-                                    px-4 py-2 rounded-full text-white transition
-                                    ${isSaving ? 'bg-sky-300 cursor-not-allowed' : 'bg-sky-600 hover:bg-sky-700'}
-                                `}
+                                className={`px-4 py-2 rounded-full text-white transition ${
+                                    isSaving
+                                        ? 'bg-sky-300 cursor-not-allowed'
+                                        : 'bg-sky-600 hover:bg-sky-700'
+                                }`}
                             >
                                 {isSaving ? 'Saving...' : 'Save'}
                             </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showDeleteModal && deleteTarget && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fadeIn">
+
+                    <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col animate-modalIn">
+
+                        {/* Header */}
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
+                            <div>
+                                <h2 className="text-lg font-semibold text-red-600">
+                                    Delete Application
+                                </h2>
+                                <p className="text-xs text-slate-500">
+                                    This action cannot be undone
+                                </p>
+                            </div>
+
+                            <button
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setDeleteTarget(null);
+                                }}
+                                className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100"
+                            >
+                                ✕
+                            </button>
                         </div>
 
+                        {/* Body */}
+                        <div className="p-5 space-y-3 text-sm">
+
+                            <p className="text-slate-600">
+                                You are about to permanently delete this application:
+                            </p>
+
+                            <div className="bg-slate-50 border border-slate-100 rounded-lg p-4 space-y-1 text-slate-700">
+                                <p><span className="font-medium">Company:</span> {deleteTarget.company}</p>
+                                <p><span className="font-medium">Location:</span> {deleteTarget.location}</p>
+                                <p><span className="font-medium">Salary:</span> {deleteTarget.salary}</p>
+                                <p><span className="font-medium">Status:</span> {deleteTarget.status}</p>
+                                <p><span className="font-medium">Applied:</span> {deleteTarget.dateApplied}</p>
+                            </div>
+
+                        </div>
+
+                        {/* Footer */}
+                        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-100">
+
+                            <button
+                                onClick={() => {
+                                    setShowDeleteModal(false);
+                                    setDeleteTarget(null);
+                                }}
+                                className="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    router.delete(`/applications/${deleteTarget.id}`, {
+                                        preserveScroll: true,
+                                        onSuccess: () => {
+                                            setShowDeleteModal(false);
+                                            setDeleteTarget(null);
+
+                                            setToast({
+                                                type: 'success',
+                                                message: 'Application deleted successfully',
+                                            });
+                                        },
+                                        onError: () => {
+                                            setToast({
+                                                type: 'error',
+                                                message: 'Failed to delete application',
+                                            });
+                                        },
+                                    });
+                                }}
+                                className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white transition"
+                            >
+                                Delete
+                            </button>
+
+                        </div>
                     </div>
                 </div>
             )}
