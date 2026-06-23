@@ -7,6 +7,10 @@ import { useForm, router, usePage } from '@inertiajs/react';
 import { useApplications } from '@/hooks/useApplications';
 import { useToast } from '@/hooks/useToast';
 import type { Application } from '@/types/application';
+import { useAuth } from '@/hooks/useAuth';
+import { useScroll } from '@/hooks/useScroll';
+
+
 
 interface PageProps {
     auth: any;
@@ -20,6 +24,95 @@ export default function Track({
     
     const app = useApplications(applications);
     const toast = useToast();
+    const authHook = useAuth();
+    const scroll = useScroll();
+
+    //Destructures
+    const {
+        query,
+        setQuery,
+
+        filtered,
+        paginated,
+
+        page,
+        setPage,
+
+        totalPages,
+        startIndex,
+        endIndex,
+
+        sortBy,
+        sortDir,
+        handleSort,
+
+        showModal,
+        setShowModal,
+
+        newApplication,
+        updateNewApplicationField,
+
+        addApplication,
+
+        showEditModal,
+        setShowEditModal,
+
+        editForm,
+        setEditForm,
+
+        updateEditField,
+
+        showDeleteModal,
+        setShowDeleteModal,
+
+        deleteTarget,
+        setDeleteTarget,
+
+        isSaving,
+
+        toast,
+        setToast,
+    } = app;
+
+    const {
+        authMode,
+        setAuthMode,
+
+        authForm,
+        setAuthForm,
+
+        authError,
+
+        showPassword,
+        setShowPassword,
+
+        showConfirmPassword,
+        setShowConfirmPassword,
+
+        resetAuthForm,
+        handleAuthSubmit,
+    } = authHook;
+
+    const {
+        logoMounted,
+
+        showScrollTop,
+
+        mobileMenuOpen,
+        setMobileMenuOpen,
+
+        trackRef,
+        aboutRef,
+        contactRef,
+
+        scrollToSection,
+        scrollToTop,
+        goToSection,
+    } = scroll;
+
+    
+
+    
 
     return (
         <>
