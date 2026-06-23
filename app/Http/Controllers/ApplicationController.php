@@ -18,17 +18,14 @@ class ApplicationController extends Controller
             'note' => ['nullable'],
         ]);
 
-        $request->user()->applications()->create([
+        $application = $request->user()->applications()->create([
             'company' => $validated['company'],
             'location' => $validated['location'] ?? null,
             'salary' => $validated['salary'] ?? null,
             'date_applied' => $validated['dateApplied'] ?? null,
-
             'status' => strtolower($validated['status']),
-
             'note' => $validated['note'] ?? null,
         ]);
-
         return back();
     }
 

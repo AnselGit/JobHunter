@@ -32,7 +32,7 @@ export default function Track({
     const [showEditModal, setShowEditModal] = useState(false);
     const [query, setQuery] = useState<string>('');
     const [logoMounted, setLogoMounted] = useState(false);
-    const [data, setData] = useState<Application[]>(applications);
+    const data = applications;
     const [sortBy, setSortBy] = useState<keyof Application | null>(null);
     const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
     const [page, setPage] = useState<number>(1);
@@ -168,30 +168,42 @@ export default function Track({
     const addApplication = () => {
         if (!newApplication.company.trim()) return;
 
-        router.post(
-            '/applications',
-            newApplication,
-            {
-                preserveScroll: true,
+        router.post('/applications', newApplication, {
+            preserveScroll: true,
 
-                onSuccess: () => {
-                    setNewApplication({
-                        company: '',
-                        location: '',
-                        salary: '',
-                        dateApplied: '',
-                        status: 'Applied',
-                        note: '',
-                    });
+            onStart: () => {
+                setIsSaving(true);
+            },
 
-                    setShowModal(false);
+            onFinish: () => {
+                setIsSaving(false);
+            },
 
-                    router.reload({
-                        only: ['applications'],
-                    });
-                },
-            }
-        );
+            onSuccess: () => {
+                setNewApplication({
+                    company: '',
+                    location: '',
+                    salary: '',
+                    dateApplied: '',
+                    status: 'Applied',
+                    note: '',
+                });
+
+                setShowModal(false);
+
+                setToast({
+                    type: 'success',
+                    message: 'Application added successfully',
+                });
+            },
+
+            onError: () => {
+                setToast({
+                    type: 'error',
+                    message: 'Failed to add application',
+                });
+            },
+        });
     };
 
     // ---------- Scroll utilities ----------
@@ -1303,6 +1315,7 @@ export default function Track({
                                 onClick={() => {
                                     router.delete(`/applications/${deleteTarget.id}`, {
                                         preserveScroll: true,
+
                                         onSuccess: () => {
                                             setShowDeleteModal(false);
                                             setDeleteTarget(null);
@@ -1312,6 +1325,7 @@ export default function Track({
                                                 message: 'Application deleted successfully',
                                             });
                                         },
+
                                         onError: () => {
                                             setToast({
                                                 type: 'error',
