@@ -2,6 +2,10 @@ import { useEffect, useMemo, useState } from 'react';
 import { router } from '@inertiajs/react';
 import type { Application } from '@/types/application';
 
+type Toast = {
+    type: 'success' | 'error';
+    message: string;
+} | null;
 
 export function useApplications(applications: Application[]) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -10,28 +14,17 @@ export function useApplications(applications: Application[]) {
     const [isSaving, setIsSaving] = useState(false);
 
     const [editForm, setEditForm] = useState<Application | null>(null);
-
-    const [editingApplication, setEditingApplication] =
-        useState<Application | null>(null);
-
     const [showEditModal, setShowEditModal] = useState(false);
 
     const [query, setQuery] = useState('');
 
-    const [sortBy, setSortBy] =
-        useState<keyof Application | null>(null);
-
-    const [sortDir, setSortDir] =
-        useState<'asc' | 'desc'>('asc');
+    const [sortBy, setSortBy] = useState<keyof Application | null>(null);
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
 
     const [page, setPage] = useState(1);
-
     const [showModal, setShowModal] = useState(false);
 
-    const [toast, setToast] = useState<{
-        type: 'success' | 'error';
-        message: string;
-    } | null>(null);
+    const [toast, setToast] = useState<Toast>(null);
 
     const [newApplication, setNewApplication] = useState({
         company: '',
@@ -64,7 +57,6 @@ export function useApplications(applications: Application[]) {
         }
 
         const n = parseFloat(s);
-
         return isNaN(n) ? 0 : n * multiplier;
     };
 
@@ -74,12 +66,11 @@ export function useApplications(applications: Application[]) {
         if (query.trim()) {
             const q = query.toLowerCase();
 
-            result = applications.filter(
-                (a) =>
-                    a.company.toLowerCase().includes(q) ||
-                    a.location.toLowerCase().includes(q) ||
-                    (a.note || '').toLowerCase().includes(q) ||
-                    a.status.toLowerCase().includes(q)
+            result = applications.filter((a) =>
+                a.company.toLowerCase().includes(q) ||
+                a.location.toLowerCase().includes(q) ||
+                (a.note || '').toLowerCase().includes(q) ||
+                a.status.toLowerCase().includes(q)
             );
         }
 
@@ -91,74 +82,47 @@ export function useApplications(applications: Application[]) {
                 let cmp = 0;
 
                 if (sortBy === 'dateApplied') {
-                    cmp =
-                        new Date(av).getTime() -
-                        new Date(bv).getTime();
+                    cmp = new Date(av).getTime() - new Date(bv).getTime();
                 } else if (sortBy === 'salary') {
-                    cmp =
-                        parseSalary(av) -
-                        parseSalary(bv);
+                    cmp = parseSalary(av) - parseSalary(bv);
                 } else {
-                    cmp = String(av || '').localeCompare(
-                        String(bv || '')
-                    );
+                    cmp = String(av || '').localeCompare(String(bv || ''));
                 }
 
-                return sortDir === 'asc'
-                    ? cmp
-                    : -cmp;
+                return sortDir === 'asc' ? cmp : -cmp;
             });
         }
 
         return result;
     }, [applications, query, sortBy, sortDir]);
 
-    const totalPages = Math.max(
-        1,
-        Math.ceil(filtered.length / itemsPerPage)
-    );
+    const totalPages = Math.max(1, Math.ceil(filtered.length / itemsPerPage));
 
     const paginated = useMemo(() => {
         const start = (page - 1) * itemsPerPage;
-
-        return filtered.slice(
-            start,
-            start + itemsPerPage
-        );
+        return filtered.slice(start, start + itemsPerPage);
     }, [filtered, page]);
 
     const startIndex =
-        filtered.length === 0
-            ? 0
-            : (page - 1) * itemsPerPage + 1;
+        filtered.length === 0 ? 0 : (page - 1) * itemsPerPage + 1;
 
-    const endIndex = Math.min(
-        page * itemsPerPage,
-        filtered.length
-    );
+    const endIndex = Math.min(page * itemsPerPage, filtered.length);
 
     useEffect(() => {
         setPage(1);
     }, [filtered]);
 
-    useEffect(() => {
-        if (!toast) return;
+    const showToast = (t: Toast) => {
+        setToast(t);
 
-        const timer = setTimeout(
-            () => setToast(null),
-            2500
-        );
+        if (t) {
+            setTimeout(() => setToast(null), 2500);
+        }
+    };
 
-        return () => clearTimeout(timer);
-    }, [toast]);
-
-    const handleSort = (
-        key: keyof Application
-    ) => {
+    const handleSort = (key: keyof Application) => {
         if (sortBy === key) {
-            setSortDir((d) =>
-                d === 'asc' ? 'desc' : 'asc'
-            );
+            setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
         } else {
             setSortBy(key);
             setSortDir('asc');
@@ -177,10 +141,7 @@ export function useApplications(applications: Application[]) {
         }));
     };
 
-    const updateEditField = (
-        field: keyof Application,
-        value: string
-    ) => {
+    const updateEditField = (field: keyof Application, value: string) => {
         if (!editForm) return;
 
         setEditForm({
@@ -192,48 +153,98 @@ export function useApplications(applications: Application[]) {
     const addApplication = () => {
         if (!newApplication.company.trim()) return;
 
-        router.post(
-            '/applications',
-            newApplication,
+        router.post('/applications', newApplication, {
+            preserveScroll: true,
+
+            onStart: () => setIsSaving(true),
+            onFinish: () => setIsSaving(false),
+
+            onSuccess: () => {
+                setNewApplication({
+                    company: '',
+                    location: '',
+                    salary: '',
+                    dateApplied: '',
+                    status: 'Applied',
+                    note: '',
+                });
+
+                setShowModal(false);
+
+                showToast({
+                    type: 'success',
+                    message: 'Application added successfully',
+                });
+            },
+
+            onError: () => {
+                showToast({
+                    type: 'error',
+                    message: 'Failed to add application',
+                });
+            },
+        });
+    };
+
+    const saveApplication = () => {
+        if (!editForm) return;
+
+        router.patch(
+            `/applications/${editForm.id}`,
+            {
+                ...editForm,
+                date_applied: editForm.dateApplied,
+                status: editForm.status.toLowerCase(),
+            },
             {
                 preserveScroll: true,
 
-                onStart: () => {
-                    setIsSaving(true);
-                },
-
-                onFinish: () => {
-                    setIsSaving(false);
-                },
+                onStart: () => setIsSaving(true),
+                onFinish: () => setIsSaving(false),
 
                 onSuccess: () => {
-                    setNewApplication({
-                        company: '',
-                        location: '',
-                        salary: '',
-                        dateApplied: '',
-                        status: 'Applied',
-                        note: '',
-                    });
+                    setShowEditModal(false);
+                    setEditForm(null);
 
-                    setShowModal(false);
-
-                    setToast({
+                    showToast({
                         type: 'success',
-                        message:
-                            'Application added successfully',
+                        message: 'Application updated successfully',
                     });
                 },
 
                 onError: () => {
-                    setToast({
+                    showToast({
                         type: 'error',
-                        message:
-                            'Failed to add application',
+                        message: 'Failed to update application',
                     });
                 },
             }
         );
+    };
+
+    const deleteApplication = () => {
+        if (!deleteTarget) return;
+
+        router.delete(`/applications/${deleteTarget.id}`, {
+            preserveScroll: true,
+
+            onSuccess: () => {
+                setShowDeleteModal(false);
+                setDeleteTarget(null);
+
+                showToast({
+                    type: 'success',
+                    message: 'Application deleted successfully',
+                });
+            },
+
+            onError: () => {
+                showToast({
+                    type: 'error',
+                    message: 'Failed to delete application',
+                });
+            },
+        });
     };
 
     return {
@@ -244,12 +255,10 @@ export function useApplications(applications: Application[]) {
         setDeleteTarget,
 
         isSaving,
+        setIsSaving,
 
         editForm,
         setEditForm,
-
-        editingApplication,
-        setEditingApplication,
 
         showEditModal,
         setShowEditModal,
@@ -279,7 +288,10 @@ export function useApplications(applications: Application[]) {
         setToast,
 
         handleSort,
+
         addApplication,
+        saveApplication,
+        deleteApplication,
 
         updateEditField,
         updateNewApplicationField,

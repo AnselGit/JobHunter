@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react';
 
-type Toast = {
-    type: 'success' | 'error';
-    message: string;
-};
-
 export function useToast() {
-    const [toast, setToast] = useState<Toast | null>(null);
+    const [toast, setToast] = useState<{
+        type: 'success' | 'error';
+        message: string;
+    } | null>(null);
 
     useEffect(() => {
         if (!toast) return;

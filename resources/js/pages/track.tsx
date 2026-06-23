@@ -5,73 +5,102 @@ import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
 import { Plus, ChevronUp, Menu, X, Eye, EyeOff, Pencil, Trash2} from "lucide-react";
 import { useForm, router, usePage } from '@inertiajs/react';
 import { useApplications } from '@/hooks/useApplications';
-import { useToast } from '@/hooks/useToast';
 import type { Application } from '@/types/application';
 import { useAuth } from '@/hooks/useAuth';
 import { useScroll } from '@/hooks/useScroll';
+import AddModal from '@/components/AddModal';
+import EditModal from '@/components/EditModal';
+import DeleteModal from '@/components/DeleteModal';
 
+interface PageProps { auth: any; applications: Application[]; }
 
-
-interface PageProps {
-    auth: any;
-    applications: Application[];
-}
-
-export default function Track({
-        auth,
-        applications,
-    }: PageProps) {
+export default function Track({ auth, applications, }: PageProps) {
     
     const app = useApplications(applications);
-    const toast = useToast();
     const authHook = useAuth();
     const scroll = useScroll();
+    const isAuthenticated = !!auth?.user;
+
+    const navButtonClass = "hover:text-white/100 text-white/80 transition hover:scale-105";
+    const thClass = "px-3 py-2 text-left text-xs font-semibold text-slate-600 uppercase";
+
+    const companyLinks = [
+        'About Us',
+        'Careers',
+        'Blog',
+    ];
+
+    const resources = [
+        'Docs',
+        'Support',
+        'Guides',
+    ];
+
+    const contacts = [
+        'Email',
+        'LinkedIn',
+        'Twitter',
+    ];
+
+    const statusSelectClass = (status: string) => {
+        switch (status.toLowerCase()) {
+            case 'accepted':
+                return 'bg-green-100 text-green-700';
+            case 'rejected':
+                return 'bg-red-100 text-red-700';
+            case 'interview':
+                return 'bg-blue-100 text-blue-700';
+            default:
+                return 'bg-slate-100 text-slate-600';
+        }
+    };
+
+    const renderSortIndicator = (key: keyof Application) => {
+        if (sortBy !== key) return null;
+
+        return sortDir === 'asc' ? '▲' : '▼';
+    };
+
+    const SORTABLE_COLUMNS: { key: keyof Application; label: string }[] = [
+        { key: 'company', label: 'Company' },
+        { key: 'location', label: 'Location' },
+        { key: 'salary', label: 'Salary' },
+        { key: 'dateApplied', label: 'Date' },
+        { key: 'status', label: 'Status' },
+    ];
 
     //Destructures
     const {
         query,
         setQuery,
-
         filtered,
         paginated,
-
         page,
         setPage,
-
         totalPages,
         startIndex,
         endIndex,
-
         sortBy,
         sortDir,
         handleSort,
-
         showModal,
         setShowModal,
-
         newApplication,
         updateNewApplicationField,
-
         addApplication,
-
         showEditModal,
         setShowEditModal,
-
         editForm,
         setEditForm,
-
         updateEditField,
-
         showDeleteModal,
         setShowDeleteModal,
-
         deleteTarget,
         setDeleteTarget,
-
         isSaving,
-
-        toast,
-        setToast,
+        setIsSaving,
+        toast,          
+        setToast        
     } = app;
 
     const {
@@ -109,9 +138,6 @@ export default function Track({
         scrollToTop,
         goToSection,
     } = scroll;
-
-    
-
     
 
     return (
@@ -610,423 +636,36 @@ export default function Track({
                 </div>
             </section>
 
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-                    <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl flex flex-col max-h-[90vh]">
+            <AddModal
+                open={app.showModal}
+                onClose={() => app.setShowModal(false)}
+                newApplication={app.newApplication}
+                updateField={app.updateNewApplicationField}
+                onSubmit={app.addApplication}
+            />
 
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                            <div>
-                                <h2 className="text-lg font-semibold text-slate-800">
-                                    Add Application
-                                </h2>
-                                <p className="text-xs text-slate-500">
-                                    Track your next opportunity
-                                </p>
-                            </div>
+            <EditModal
+                open={app.showEditModal}
+                editForm={app.editForm}
+                setEditForm={app.setEditForm}
+                updateField={app.updateEditField}
+                isSaving={app.isSaving}
+                onClose={() => {
+                    app.setShowEditModal(false);
+                    app.setEditForm(null);
+                }}
+                onSave={app.saveApplication}
+            />
 
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        {/* Body */}
-                        <div className="p-5 space-y-4 overflow-y-auto flex-1 min-h-0">
-
-                            {/* Company */}
-                            <div>
-                                <label className="block text-xs font-medium text-slate-600 mb-1">
-                                    Company
-                                </label>
-                                <input
-                                    value={newApplication.company}
-                                    onChange={(e) =>
-                                        updateNewApplicationField('company', e.target.value)
-                                    }
-                                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
-                                />
-                            </div>
-
-                            {/* Location + Salary */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Location
-                                    </label>
-                                    <input
-                                        value={newApplication.location}
-                                        onChange={(e) =>
-                                            updateNewApplicationField('location', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Salary
-                                    </label>
-                                    <input
-                                        value={newApplication.salary}
-                                        onChange={(e) =>
-                                            updateNewApplicationField('salary', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Date + Status */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Applied
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={newApplication.dateApplied}
-                                        onChange={(e) =>
-                                            updateNewApplicationField('dateApplied', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Status
-                                    </label>
-                                    <select
-                                        value={newApplication.status}
-                                        onChange={(e) =>
-                                            updateNewApplicationField('status', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
-                                    >
-                                        <option value="Applied">Applied</option>
-                                        <option value="Interview">Interview</option>
-                                        <option value="Offer">Offer</option>
-                                        <option value="Rejected">Rejected</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Notes */}
-                            <div>
-                                <label className="block text-xs font-medium text-slate-600 mb-1">
-                                    Notes
-                                </label>
-                                <textarea
-                                    rows={3}
-                                    value={newApplication.note}
-                                    onChange={(e) =>
-                                        updateNewApplicationField('note', e.target.value)
-                                    }
-                                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 resize-none"
-                                />
-                            </div>
-                        </div>
-
-                        {/* Footer */}
-                        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-100">
-                            <button
-                                onClick={() => setShowModal(false)}
-                                className="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={addApplication}
-                                className="px-4 py-2 rounded-full bg-sky-600 hover:bg-sky-700 text-white transition"
-                            >
-                                Add
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
-            )}
-
-            {showEditModal && editForm && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4 animate-fadeIn">
-
-                    <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col animate-modalIn">
-
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                            <div>
-                                <h2 className="text-lg font-semibold text-slate-800">
-                                    Edit Application
-                                </h2>
-                                <p className="text-xs text-slate-500">
-                                    Update your application details
-                                </p>
-                            </div>
-
-                            <button
-                                onClick={() => {
-                                    setShowEditModal(false);
-                                    setEditForm(null);
-                                }}
-                                className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        {/* Body */}
-                        <div className="p-5 space-y-4 overflow-y-auto flex-1 min-h-0">
-
-                            {/* Company */}
-                            <div>
-                                <label className="block text-xs font-medium text-slate-600 mb-1">
-                                    Company
-                                </label>
-                                <input
-                                    value={editForm.company}
-                                    onChange={(e) =>
-                                        updateEditField('company', e.target.value)
-                                    }
-                                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
-                                />
-                            </div>
-
-                            {/* Location + Salary */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Location
-                                    </label>
-                                    <input
-                                        value={editForm.location}
-                                        onChange={(e) =>
-                                            updateEditField('location', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Salary
-                                    </label>
-                                    <input
-                                        value={editForm.salary}
-                                        onChange={(e) =>
-                                            updateEditField('salary', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Date + Status */}
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Applied
-                                    </label>
-                                    <input
-                                        type="date"
-                                        value={editForm.dateApplied}
-                                        onChange={(e) =>
-                                            updateEditField('dateApplied', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-xs font-medium text-slate-600 mb-1">
-                                        Status
-                                    </label>
-                                    <select
-                                        value={editForm.status}
-                                        onChange={(e) =>
-                                            updateEditField('status', e.target.value)
-                                        }
-                                        className="w-full rounded-lg border border-slate-200 px-3 py-2.5 focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
-                                    >
-                                        <option>Applied</option>
-                                        <option>Interview</option>
-                                        <option>Offer</option>
-                                        <option>Rejected</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Notes */}
-                            <div>
-                                <label className="block text-xs font-medium text-slate-600 mb-1">
-                                    Notes
-                                </label>
-                                <textarea
-                                    rows={3}
-                                    value={editForm.note || ''}
-                                    onChange={(e) =>
-                                        updateEditField('note', e.target.value)
-                                    }
-                                    className="w-full rounded-lg border border-slate-200 px-3 py-2.5 resize-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 outline-none"
-                                />
-                            </div>
-
-                        </div>
-
-                        {/* Footer */}
-                        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-100">
-
-                            <button
-                                onClick={() => {
-                                    setShowEditModal(false);
-                                    setEditForm(null);
-                                }}
-                                className="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                disabled={isSaving}
-                                onClick={() => {
-                                    if (!editForm) return;
-
-                                    router.patch(`/applications/${editForm.id}`, {
-                                        ...editForm,
-                                        date_applied: editForm.dateApplied,
-                                        status: editForm.status.toLowerCase(),
-                                    }, {
-                                        preserveScroll: true,
-
-                                        onStart: () => setIsSaving(true),
-                                        onFinish: () => setIsSaving(false),
-
-                                        onSuccess: () => {
-                                            setShowEditModal(false);
-                                            setEditForm(null);
-
-                                            setToast({
-                                                type: 'success',
-                                                message: 'Application updated successfully',
-                                            });
-                                        },
-
-                                        onError: () => {
-                                            setToast({
-                                                type: 'error',
-                                                message: 'Failed to update application',
-                                            });
-                                        },
-                                    });
-                                }}
-                                className={`px-4 py-2 rounded-full text-white transition ${
-                                    isSaving
-                                        ? 'bg-sky-300 cursor-not-allowed'
-                                        : 'bg-sky-600 hover:bg-sky-700'
-                                }`}
-                            >
-                                {isSaving ? 'Saving...' : 'Save'}
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {showDeleteModal && deleteTarget && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-fadeIn">
-
-                    <div className="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col animate-modalIn">
-
-                        {/* Header */}
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100">
-                            <div>
-                                <h2 className="text-lg font-semibold text-red-600">
-                                    Delete Application
-                                </h2>
-                                <p className="text-xs text-slate-500">
-                                    This action cannot be undone
-                                </p>
-                            </div>
-
-                            <button
-                                onClick={() => {
-                                    setShowDeleteModal(false);
-                                    setDeleteTarget(null);
-                                }}
-                                className="h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100"
-                            >
-                                ✕
-                            </button>
-                        </div>
-
-                        {/* Body */}
-                        <div className="p-5 space-y-3 text-sm">
-
-                            <p className="text-slate-600">
-                                You are about to permanently delete this application:
-                            </p>
-
-                            <div className="bg-slate-50 border border-slate-100 rounded-lg p-4 space-y-1 text-slate-700">
-                                <p><span className="font-medium">Company:</span> {deleteTarget.company}</p>
-                                <p><span className="font-medium">Location:</span> {deleteTarget.location}</p>
-                                <p><span className="font-medium">Salary:</span> {deleteTarget.salary}</p>
-                                <p><span className="font-medium">Status:</span> {deleteTarget.status}</p>
-                                <p><span className="font-medium">Applied:</span> {deleteTarget.dateApplied}</p>
-                            </div>
-
-                        </div>
-
-                        {/* Footer */}
-                        <div className="flex justify-end gap-2 px-5 py-4 border-t border-slate-100">
-
-                            <button
-                                onClick={() => {
-                                    setShowDeleteModal(false);
-                                    setDeleteTarget(null);
-                                }}
-                                className="px-4 py-2 rounded-full border border-slate-200 hover:bg-slate-50 transition"
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={() => {
-                                    router.delete(`/applications/${deleteTarget.id}`, {
-                                        preserveScroll: true,
-
-                                        onSuccess: () => {
-                                            setShowDeleteModal(false);
-                                            setDeleteTarget(null);
-
-                                            setToast({
-                                                type: 'success',
-                                                message: 'Application deleted successfully',
-                                            });
-                                        },
-
-                                        onError: () => {
-                                            setToast({
-                                                type: 'error',
-                                                message: 'Failed to delete application',
-                                            });
-                                        },
-                                    });
-                                }}
-                                className="px-4 py-2 rounded-full bg-red-600 hover:bg-red-700 text-white transition"
-                            >
-                                Delete
-                            </button>
-
-                        </div>
-                    </div>
-                </div>
-            )}
+            <DeleteModal
+                open={app.showDeleteModal}
+                deleteTarget={app.deleteTarget}
+                onClose={() => {
+                    app.setShowDeleteModal(false);
+                    app.setDeleteTarget(null);
+                }}
+                onDelete={app.deleteApplication}
+            />
 
             <div className="footer-area">
                 <footer ref={aboutRef} className="track-footer">
@@ -1133,6 +772,7 @@ export default function Track({
                     className={`
                         fixed bottom-6 left-1/2 -translate-x-1/2 z-50
                         px-4 py-3 rounded-xl shadow-lg text-white
+                        transition-all duration-300
                         ${toast.type === 'success' ? 'bg-green-500' : 'bg-red-500'}
                     `}
                 >
