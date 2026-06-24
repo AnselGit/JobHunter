@@ -8,6 +8,12 @@ type Toast = {
 } | null;
 
 export function useApplications(applications: Application[]) {
+    const [showBatchDeleteModal, setShowBatchDeleteModal] = useState(false);
+    const [batchTargets, setBatchTargets] = useState<Application[]>([]);
+    const [batchDeleteType, setBatchDeleteType] = useState<
+        'all' | 'applied' | 'interview' | 'offer' | 'rejected'
+    >('all');
+
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState<Application | null>(null);
 
@@ -31,7 +37,7 @@ export function useApplications(applications: Application[]) {
         location: '',
         salary: '',
         dateApplied: '',
-        status: 'Applied',
+        status: 'applied',
         note: '',
     });
 
@@ -165,7 +171,7 @@ export function useApplications(applications: Application[]) {
                     location: '',
                     salary: '',
                     dateApplied: '',
-                    status: 'Applied',
+                    status: 'applied',
                     note: '',
                 });
 
@@ -247,7 +253,78 @@ export function useApplications(applications: Application[]) {
         });
     };
 
+    const openBatchDelete = (
+        type: 'all' | 'applied' | 'interview' | 'offer' | 'rejected'
+    ) => {
+        const targets =
+            type === 'all'
+                ? applications
+                : applications.filter(
+                    (app) => app.status === type
+                );
+
+        if (targets.length === 0) {
+            showToast({
+                type: 'error',
+                message: `No ${type} applications found`,
+            });
+
+            return;
+        }
+
+        setBatchDeleteType(type);
+        setBatchTargets(targets);
+        setShowBatchDeleteModal(true);
+    };
+
+    const deleteBatchApplications = () => {
+        if (batchTargets.length === 0) return;
+
+        router.delete('/applications/batch', {
+            data: {
+                ids: batchTargets.map((a) => a.id),
+            },
+
+            preserveScroll: true,
+
+            onStart: () => setIsSaving(true),
+
+            onFinish: () => setIsSaving(false),
+
+            onSuccess: () => {
+                setShowBatchDeleteModal(false);
+
+                setBatchTargets([]);
+
+                showToast({
+                    type: 'success',
+                    message: `${batchTargets.length} applications deleted`,
+                });
+            },
+
+            onError: () => {
+                showToast({
+                    type: 'error',
+                    message: 'Batch delete failed',
+                });
+            },
+        });
+    };
+
     return {
+        deleteBatchApplications,
+        
+        showBatchDeleteModal,
+        setShowBatchDeleteModal,
+
+        batchDeleteType,
+        setBatchDeleteType,
+
+        batchTargets,
+        setBatchTargets,
+
+        openBatchDelete,
+
         showDeleteModal,
         setShowDeleteModal,
 

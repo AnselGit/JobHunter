@@ -39,6 +39,7 @@ Route::post('/logout', [AuthController::class, 'logout']);
 // Crud
 Route::middleware('auth')->group(function () {
     Route::post('/applications', [ApplicationController::class, 'store']);
+    Route::delete('/applications/batch', [ApplicationController::class, 'batchDestroy']);
     Route::patch('/applications/{id}', [ApplicationController::class, 'update']);
     Route::delete('/applications/{id}', [ApplicationController::class, 'destroy']);
 });

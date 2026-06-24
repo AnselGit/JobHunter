@@ -55,4 +55,15 @@ class ApplicationController extends Controller
 
         return back();
     }
+
+    public function batchDestroy(Request $request)
+    {
+        Application::whereIn(
+            'id',
+            $request->ids
+        )->delete();
+
+        return back();
+    }
+
 }

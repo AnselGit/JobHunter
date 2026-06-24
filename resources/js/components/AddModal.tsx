@@ -129,21 +129,30 @@ export default function AddModal({
                             <label className="block text-xs font-medium text-slate-600 mb-1">
                                 Status
                             </label>
-
                             <select
                                 value={newApplication.status}
                                 onChange={(e) =>
-                                    updateField(
-                                        'status',
-                                        e.target.value
-                                    )
+                                    updateField('status', e.target.value)
                                 }
-                                className="w-full rounded-lg border border-slate-200 px-3 py-2.5"
+                                className="
+                                    w-full
+                                    rounded-lg
+                                    border
+                                    border-slate-200
+                                    px-3
+                                    py-2.5
+                                    bg-white
+                                    text-slate-700
+                                    focus:ring-2
+                                    focus:ring-sky-500
+                                    focus:border-sky-500
+                                    outline-none
+                                "
                             >
-                                <option value="Applied">Applied</option>
-                                <option value="Interview">Interview</option>
-                                <option value="Offer">Offer</option>
-                                <option value="Rejected">Rejected</option>
+                                <option value="applied">Applied</option>
+                                <option value="interview">Interview</option>
+                                <option value="offer">Offer</option>
+                                <option value="rejected">Rejected</option>
                             </select>
                         </div>
 

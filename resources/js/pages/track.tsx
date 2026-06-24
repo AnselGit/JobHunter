@@ -2,7 +2,7 @@ import { Head } from '@inertiajs/react';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import logoUrl from '../../assets/JobHunter_Logo.png';
 import JobHunterLogo from "../../assets/JobHunterBlue_Logo.png";
-import { Plus, ChevronUp, Menu, X, Eye, EyeOff, Pencil, Trash2} from "lucide-react";
+import { Plus, ChevronUp, Menu, X, Eye, EyeOff, Pencil, Trash2, MoreVertical } from "lucide-react";
 import { useForm, router, usePage } from '@inertiajs/react';
 import { useApplications } from '@/hooks/useApplications';
 import type { Application } from '@/types/application';
@@ -11,11 +11,12 @@ import { useScroll } from '@/hooks/useScroll';
 import AddModal from '@/components/AddModal';
 import EditModal from '@/components/EditModal';
 import DeleteModal from '@/components/DeleteModal';
+import BatchDeleteModal from '@/components/BatchDeleteModal';
 
 interface PageProps { auth: any; applications: Application[]; }
 
 export default function Track({ auth, applications, }: PageProps) {
-    
+    const [showBatchMenu, setShowBatchMenu] = useState(false);
     const app = useApplications(applications);
     const authHook = useAuth();
     const scroll = useScroll();
@@ -44,12 +45,15 @@ export default function Track({ auth, applications, }: PageProps) {
 
     const statusSelectClass = (status: string) => {
         switch (status.toLowerCase()) {
-            case 'accepted':
+            case 'offer':
                 return 'bg-green-100 text-green-700';
+
             case 'rejected':
                 return 'bg-red-100 text-red-700';
+
             case 'interview':
                 return 'bg-blue-100 text-blue-700';
+
             default:
                 return 'bg-slate-100 text-slate-600';
         }
@@ -73,34 +77,56 @@ export default function Track({ auth, applications, }: PageProps) {
     const {
         query,
         setQuery,
+
         filtered,
         paginated,
+
         page,
         setPage,
+
         totalPages,
         startIndex,
         endIndex,
+
         sortBy,
         sortDir,
         handleSort,
+
         showModal,
         setShowModal,
+
         newApplication,
         updateNewApplicationField,
         addApplication,
+
         showEditModal,
         setShowEditModal,
+
         editForm,
         setEditForm,
         updateEditField,
+
         showDeleteModal,
         setShowDeleteModal,
+
         deleteTarget,
         setDeleteTarget,
+
+        showBatchDeleteModal,
+        setShowBatchDeleteModal,
+
+        batchDeleteType,
+        batchTargets,
+        setBatchTargets,
+
+        openBatchDelete,
+        deleteBatchApplications,
+
         isSaving,
         setIsSaving,
-        toast,          
-        setToast        
+
+        toast,
+        setToast,
     } = app;
 
     const {
@@ -516,7 +542,74 @@ export default function Track({ auth, applications, }: PageProps) {
                                                         </th>
                                                     ))}
                                                     <th className={thClass}>Note</th>
-                                                    <th className={thClass}>Actions</th>
+                                                    <th className={thClass}>
+                                                        <div className="relative flex items-center justify-between">
+                                                            <span>Actions</span>
+
+                                                            <button
+                                                                onClick={() => setShowBatchMenu((v) => !v)}
+                                                                className="rounded-md p-1 hover:bg-slate-100"
+                                                            >
+                                                                <MoreVertical size={16} />
+                                                            </button>
+
+                                                            {showBatchMenu && (
+                                                                <div className="absolute right-0 top-8 z-50 w-56 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            app.openBatchDelete('all');
+                                                                            setShowBatchMenu(false);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                                    >
+                                                                        Delete All
+                                                                    </button>
+
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            app.openBatchDelete('applied');
+                                                                            setShowBatchMenu(false);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                                    >
+                                                                        Delete Applied
+                                                                    </button>
+
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            app.openBatchDelete('interview');
+                                                                            setShowBatchMenu(false);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                                    >
+                                                                        Delete Interview
+                                                                    </button>
+
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            app.openBatchDelete('offer');
+                                                                            setShowBatchMenu(false);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                                    >
+                                                                        Delete Offer
+                                                                    </button>
+
+                                                                    <button
+                                                                        onClick={() => {
+                                                                            openBatchDelete('rejected');
+                                                                            setShowBatchMenu(false);
+                                                                        }}
+                                                                        className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
+                                                                    >
+                                                                        Delete Rejected
+                                                                    </button>
+
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-slate-100">
@@ -547,7 +640,7 @@ export default function Track({ auth, applications, }: PageProps) {
                                                             {/* Status */}
                                                             <td className="px-3 py-3 align-top text-sm">
                                                                 <span className={`inline-flex rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}>
-                                                                    {a.status}
+                                                                    {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
                                                                 </span>
                                                             </td>
 
@@ -635,37 +728,6 @@ export default function Track({ auth, applications, }: PageProps) {
 
                 </div>
             </section>
-
-            <AddModal
-                open={app.showModal}
-                onClose={() => app.setShowModal(false)}
-                newApplication={app.newApplication}
-                updateField={app.updateNewApplicationField}
-                onSubmit={app.addApplication}
-            />
-
-            <EditModal
-                open={app.showEditModal}
-                editForm={app.editForm}
-                setEditForm={app.setEditForm}
-                updateField={app.updateEditField}
-                isSaving={app.isSaving}
-                onClose={() => {
-                    app.setShowEditModal(false);
-                    app.setEditForm(null);
-                }}
-                onSave={app.saveApplication}
-            />
-
-            <DeleteModal
-                open={app.showDeleteModal}
-                deleteTarget={app.deleteTarget}
-                onClose={() => {
-                    app.setShowDeleteModal(false);
-                    app.setDeleteTarget(null);
-                }}
-                onDelete={app.deleteApplication}
-            />
 
             <div className="footer-area">
                 <footer ref={aboutRef} className="track-footer">
@@ -766,6 +828,49 @@ export default function Track({ auth, applications, }: PageProps) {
             >
                 <ChevronUp size={24} strokeWidth={2.5} />
             </button>
+
+            <AddModal
+                open={app.showModal}
+                onClose={() => app.setShowModal(false)}
+                newApplication={app.newApplication}
+                updateField={app.updateNewApplicationField}
+                onSubmit={app.addApplication}
+            />
+
+            <EditModal
+                open={app.showEditModal}
+                editForm={app.editForm}
+                setEditForm={app.setEditForm}
+                updateField={app.updateEditField}
+                isSaving={app.isSaving}
+                onClose={() => {
+                    app.setShowEditModal(false);
+                    app.setEditForm(null);
+                }}
+                onSave={app.saveApplication}
+            />
+
+            <DeleteModal
+                open={app.showDeleteModal}
+                deleteTarget={app.deleteTarget}
+                onClose={() => {
+                    app.setShowDeleteModal(false);
+                    app.setDeleteTarget(null);
+                }}
+                onDelete={app.deleteApplication}
+            />
+
+            <BatchDeleteModal
+                open={showBatchDeleteModal}
+                batchType={batchDeleteType}
+                applications={batchTargets}
+                isDeleting={isSaving}
+                onClose={() => {
+                    setShowBatchDeleteModal(false);
+                    setBatchTargets([]);
+                }}
+                onConfirm={deleteBatchApplications}
+            />
 
             {toast && (
                 <div
