@@ -43,6 +43,24 @@ export default function Track({ auth, applications, }: PageProps) {
         'Twitter',
     ];
 
+    const BATCH_DELETE_OPTIONS = [
+        { key: 'all', label: 'Delete All', danger: false },
+        { key: 'applied', label: 'Delete Applied', danger: false },
+        { key: 'interview', label: 'Delete Interview', danger: false },
+        { key: 'offer', label: 'Delete Offer', danger: false },
+        { key: 'rejected', label: 'Delete Rejected', danger: true },
+    ] as const;
+
+    const TABLE_COLUMNS = [
+        { key: 'company', label: 'Company' },
+        { key: 'location', label: 'Location' },
+        { key: 'salary', label: 'Salary' },
+        { key: 'dateApplied', label: 'Date' },
+        { key: 'status', label: 'Status' },
+        { key: 'note', label: 'Note', },
+        { key: 'actions', label: 'Actions' },
+    ] as const;
+
     const statusSelectClass = (status: string) => {
         switch (status.toLowerCase()) {
             case 'offer':
@@ -64,14 +82,6 @@ export default function Track({ auth, applications, }: PageProps) {
 
         return sortDir === 'asc' ? '▲' : '▼';
     };
-
-    const SORTABLE_COLUMNS: { key: keyof Application; label: string }[] = [
-        { key: 'company', label: 'Company' },
-        { key: 'location', label: 'Location' },
-        { key: 'salary', label: 'Salary' },
-        { key: 'dateApplied', label: 'Date' },
-        { key: 'status', label: 'Status' },
-    ];
 
     //Destructures
     const {
@@ -529,130 +539,102 @@ export default function Track({ auth, applications, }: PageProps) {
                                         <table className="min-w-180 w-full divide-y divide-slate-200">
                                             <thead>
                                                 <tr>
-                                                    {SORTABLE_COLUMNS.map(({ key, label }) => (
-                                                        <th key={key} className={thClass}>
-                                                            <button
-                                                                type="button"
-                                                                onClick={() => handleSort(key)}
-                                                                className="flex items-center gap-2"
-                                                            >
-                                                                <span>{label}</span>
-                                                                {renderSortIndicator(key)}
-                                                            </button>
-                                                        </th>
-                                                    ))}
-                                                    <th className={thClass}>Note</th>
-                                                    <th className={thClass}>
-                                                        <div className="relative flex items-center justify-between">
-                                                            <span>Actions</span>
+                                                    {TABLE_COLUMNS.map(({ key, label }) => {
+                                                        if (key === 'note') {
+                                                            return <th key={key} className={thClass}>{label}</th>;
+                                                        }
 
-                                                            <button
-                                                                onClick={() => setShowBatchMenu((v) => !v)}
-                                                                className="rounded-md p-1 hover:bg-slate-100"
-                                                            >
-                                                                <MoreVertical size={16} />
-                                                            </button>
+                                                        if (key === 'actions') {
+                                                            return (
+                                                                <th key={key} className={thClass}>
+                                                                    <div className="relative flex items-center justify-between">
+                                                                        <span>{label}</span>
 
-                                                            {showBatchMenu && (
-                                                                <div className="absolute right-0 top-8 z-50 w-56 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
+                                                                        <button
+                                                                            onClick={() => setShowBatchMenu((v) => !v)}
+                                                                            className="rounded-md p-1 hover:bg-slate-100"
+                                                                        >
+                                                                            <MoreVertical size={16} />
+                                                                        </button>
 
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('all');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete All
-                                                                    </button>
+                                                                        {showBatchMenu && (
+                                                                            <div className="absolute right-0 top-8 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                                                                {BATCH_DELETE_OPTIONS.map(({ key, label, danger }) => (
+                                                                                    <button
+                                                                                        key={key}
+                                                                                        onClick={() => {
+                                                                                            openBatchDelete(key);
+                                                                                            setShowBatchMenu(false);
+                                                                                        }}
+                                                                                        className={`w-full px-4 py-2 text-left ${
+                                                                                            danger
+                                                                                                ? 'text-red-600 hover:bg-red-50'
+                                                                                                : 'hover:bg-slate-50'
+                                                                                        }`}
+                                                                                    >
+                                                                                        {label}
+                                                                                    </button>
+                                                                                ))}
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </th>
+                                                            );
+                                                        }
 
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('applied');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete Applied
-                                                                    </button>
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('interview');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete Interview
-                                                                    </button>
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('offer');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete Offer
-                                                                    </button>
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            openBatchDelete('rejected');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
-                                                                    >
-                                                                        Delete Rejected
-                                                                    </button>
-
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </th>
+                                                        return (
+                                                            <th key={key} className={thClass}>
+                                                                <button
+                                                                    type="button"
+                                                                    onClick={() => handleSort(key)}
+                                                                    className="flex items-center gap-2"
+                                                                >
+                                                                    <span>{label}</span>
+                                                                    {renderSortIndicator(key)}
+                                                                </button>
+                                                            </th>
+                                                        );
+                                                    })}
                                                 </tr>
                                             </thead>
-                                            <tbody className="bg-white divide-y divide-slate-100">
+
+                                            <tbody className="divide-y divide-slate-100 bg-white">
                                                 {filtered.length > 0 ? (
                                                     paginated.map((a) => (
-                                                        <tr key={a.id} className="odd:bg-white even:bg-slate-50 hover:bg-slate-100 transition-colors">
-
-                                                            {/* Company */}
+                                                        <tr
+                                                            key={a.id}
+                                                            className="odd:bg-white even:bg-slate-50 hover:bg-slate-100 transition-colors"
+                                                        >
                                                             <td className="px-3 py-3 align-top text-sm text-slate-800">
                                                                 {a.company}
                                                             </td>
 
-                                                            {/* Location */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-700">
                                                                 {a.location}
                                                             </td>
 
-                                                            {/* Salary */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-700">
                                                                 {a.salary}
                                                             </td>
 
-                                                            {/* Date Applied */}
                                                             <td className="px-3 py-3 align-top text-sm text-slate-700">
                                                                 {a.dateApplied}
                                                             </td>
 
-                                                            {/* Status */}
                                                             <td className="px-3 py-3 align-top text-sm">
-                                                                <span className={`inline-flex rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}>
+                                                                <span
+                                                                    className={`inline-flex rounded-full px-2 py-1 text-sm ${statusSelectClass(a.status)}`}
+                                                                >
                                                                     {a.status.charAt(0).toUpperCase() + a.status.slice(1)}
                                                                 </span>
                                                             </td>
 
-                                                            {/* Note */}
-                                                            <td className="px-3 py-3 align-top text-sm text-slate-500">
+                                                            <td className="w-[40%] px-3 py-3 align-top text-sm text-slate-500">
                                                                 {a.note || '-'}
                                                             </td>
 
-                                                            <td className="px-3 py-3 align-top text-sm">
-                                                                <div className="flex items-center gap-3">
-
-                                                                    {/* Edit */}
+                                                            <td className="w-1 whitespace-nowrap px-2 py-3 align-top text-sm">
+                                                                <div className="flex items-center gap-2">
                                                                     <button
                                                                         onClick={() => {
                                                                             setEditForm({ ...a });
@@ -663,7 +645,6 @@ export default function Track({ auth, applications, }: PageProps) {
                                                                         <Pencil size={18} />
                                                                     </button>
 
-                                                                    {/* Delete */}
                                                                     <button
                                                                         onClick={() => {
                                                                             setDeleteTarget(a);
@@ -673,15 +654,18 @@ export default function Track({ auth, applications, }: PageProps) {
                                                                     >
                                                                         <Trash2 size={18} />
                                                                     </button>
-
                                                                 </div>
                                                             </td>
-
                                                         </tr>
                                                     ))
                                                 ) : (
                                                     <tr>
-                                                        <td colSpan={6} className="py-10 text-center text-slate-400">No results found</td>
+                                                        <td
+                                                            colSpan={TABLE_COLUMNS.length}
+                                                            className="py-10 text-center text-slate-400"
+                                                        >
+                                                            No results found
+                                                        </td>
                                                     </tr>
                                                 )}
                                             </tbody>
