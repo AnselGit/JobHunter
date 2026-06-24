@@ -485,8 +485,9 @@ export default function Track({ auth, applications, }: PageProps) {
                         ) : (
                             <>
                                 <div className="mb-6 flex justify-center">
-                                    <div className="w-full max-w-2xl">
-                                        <div className="grid grid-cols-[1fr_auto] gap-3">
+                                    <div className="w-full max-w-4xl">
+                                        {/* toolbar */}
+                                        <div className="grid grid-cols-[1fr_auto_auto] gap-3">
                                             <input
                                                 value={query}
                                                 onChange={(e) => setQuery(e.target.value)}
@@ -502,9 +503,10 @@ export default function Track({ auth, applications, }: PageProps) {
                                                     focus:outline-none
                                                     focus:ring-2
                                                     focus:ring-sky-300
-                                                    transition
                                                 "
                                             />
+
+                                            {/* Add Button */}
                                             <button
                                                 onClick={() => setShowModal(true)}
                                                 className="
@@ -515,11 +517,88 @@ export default function Track({ auth, applications, }: PageProps) {
                                                     flex items-center justify-center
                                                     text-white
                                                     shadow-lg
-                                                    transition
+                                                    transition-all
+                                                    duration-200
+                                                    hover:scale-105
                                                 "
                                             >
                                                 <Plus size={22} strokeWidth={2.5} />
                                             </button>
+
+                                            {/* Batch Menu */}
+                                            <div className="relative">
+                                                <button
+                                                    onClick={() => setShowBatchMenu((v) => !v)}
+                                                    className="
+                                                        rounded-full
+                                                        bg-white
+                                                        hover:bg-slate-50
+                                                        w-12 h-12
+                                                        flex items-center justify-center
+                                                        text-slate-700
+                                                        shadow-lg
+                                                        transition-all
+                                                        duration-200
+                                                        hover:scale-105
+                                                    "
+                                                >
+                                                    <MoreVertical size={20} />
+                                                </button>
+
+                                                {showBatchMenu && (
+                                                    <div className="absolute right-0 mt-2 z-50 w-56 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl">
+                                                        <button
+                                                            onClick={() => {
+                                                                openBatchDelete('all');
+                                                                setShowBatchMenu(false);
+                                                            }}
+                                                            className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                        >
+                                                            Delete All
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                openBatchDelete('applied');
+                                                                setShowBatchMenu(false);
+                                                            }}
+                                                            className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                        >
+                                                            Delete Applied
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                openBatchDelete('interview');
+                                                                setShowBatchMenu(false);
+                                                            }}
+                                                            className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                        >
+                                                            Delete Interview
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                openBatchDelete('offer');
+                                                                setShowBatchMenu(false);
+                                                            }}
+                                                            className="w-full px-4 py-2 text-left hover:bg-slate-50"
+                                                        >
+                                                            Delete Offer
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => {
+                                                                openBatchDelete('rejected');
+                                                                setShowBatchMenu(false);
+                                                            }}
+                                                            className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
+                                                        >
+                                                            Delete Rejected
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -542,74 +621,7 @@ export default function Track({ auth, applications, }: PageProps) {
                                                         </th>
                                                     ))}
                                                     <th className={thClass}>Note</th>
-                                                    <th className={thClass}>
-                                                        <div className="relative flex items-center justify-between">
-                                                            <span>Actions</span>
-
-                                                            <button
-                                                                onClick={() => setShowBatchMenu((v) => !v)}
-                                                                className="rounded-md p-1 hover:bg-slate-100"
-                                                            >
-                                                                <MoreVertical size={16} />
-                                                            </button>
-
-                                                            {showBatchMenu && (
-                                                                <div className="absolute right-0 top-8 z-50 w-56 rounded-xl border border-slate-200 bg-white shadow-xl overflow-hidden">
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('all');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete All
-                                                                    </button>
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('applied');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete Applied
-                                                                    </button>
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('interview');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete Interview
-                                                                    </button>
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            app.openBatchDelete('offer');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left hover:bg-slate-50"
-                                                                    >
-                                                                        Delete Offer
-                                                                    </button>
-
-                                                                    <button
-                                                                        onClick={() => {
-                                                                            openBatchDelete('rejected');
-                                                                            setShowBatchMenu(false);
-                                                                        }}
-                                                                        className="w-full px-4 py-2 text-left text-red-600 hover:bg-red-50"
-                                                                    >
-                                                                        Delete Rejected
-                                                                    </button>
-
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </th>
+                                                    <th className={`${thClass} w-20`}>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="bg-white divide-y divide-slate-100">
