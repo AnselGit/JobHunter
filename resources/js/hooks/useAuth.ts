@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { router } from '@inertiajs/react';
 
 export function useAuth() {
@@ -22,7 +22,55 @@ export function useAuth() {
     });
 
     const [showForgotModal, setShowForgotModal] =
-    useState(false);
+        useState(false);
+
+    const [forgotStep, setForgotStep] =
+        useState<'email' | 'waiting' | 'reset'>(
+            'email'
+        );
+
+    const [forgotEmail, setForgotEmail] =
+        useState('');
+
+    const [emailVerified, setEmailVerified] =
+        useState(false);
+
+    const [resendCooldown, setResendCooldown] =
+        useState(0);
+
+    const [expiryCountdown, setExpiryCountdown] =
+        useState(300);
+
+    const [newPassword, setNewPassword] =
+        useState('');
+
+    const [confirmNewPassword, setConfirmNewPassword] =
+        useState('');
+
+    useEffect(() => {
+        if (
+            forgotStep !== 'waiting' ||
+            expiryCountdown <= 0
+        ) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setExpiryCountdown((v) => v - 1);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [forgotStep, expiryCountdown]);
+
+    useEffect(() => {
+        if (resendCooldown <= 0) return;
+
+        const timer = setTimeout(() => {
+            setResendCooldown((v) => v - 1);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [resendCooldown]);
 
     const resetAuthForm = () => {
         setAuthForm({
@@ -145,6 +193,33 @@ export function useAuth() {
         );
     };
 
+    const resetForgotPassword = () => {
+        setShowForgotModal(false);
+
+        setForgotStep('email');
+
+        setForgotEmail('');
+
+        setEmailVerified(false);
+
+        setResendCooldown(0);
+
+        setExpiryCountdown(300);
+
+        setNewPassword('');
+
+        setConfirmNewPassword('');
+    };
+
+    const formatCountdown = (seconds: number) => {
+        const mins = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+
+        return `${mins}:${secs
+            .toString()
+            .padStart(2, '0')}`;
+    };
+
     return {
         authMode,
         setAuthMode,
@@ -165,5 +240,29 @@ export function useAuth() {
 
         showForgotModal,
         setShowForgotModal,
+
+        forgotStep,
+        setForgotStep,
+
+        forgotEmail,
+        setForgotEmail,
+
+        emailVerified,
+        setEmailVerified,
+
+        resendCooldown,
+        setResendCooldown,
+
+        expiryCountdown,
+        setExpiryCountdown,
+
+        newPassword,
+        setNewPassword,
+
+        confirmNewPassword,
+        setConfirmNewPassword,
+
+        resetForgotPassword,
+        formatCountdown,
     };
 }

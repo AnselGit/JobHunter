@@ -12,6 +12,7 @@ import AddModal from '@/components/AddModal';
 import EditModal from '@/components/EditModal';
 import DeleteModal from '@/components/DeleteModal';
 import BatchDeleteModal from '@/components/BatchDeleteModal';
+import ForgotPasswordModal from '@/components/ForgotPasswordModal';
 
 interface PageProps { auth: any; applications: Application[]; }
 
@@ -149,6 +150,25 @@ export default function Track({ auth, applications, }: PageProps) {
 
         showForgotModal,
         setShowForgotModal,
+
+        forgotStep,
+        setForgotStep,
+
+        forgotEmail,
+        setForgotEmail,
+
+        resendCooldown,
+        setResendCooldown,
+
+        expiryCountdown,
+
+        newPassword,
+        setNewPassword,
+
+        confirmNewPassword,
+        setConfirmNewPassword,
+
+        resetForgotPassword,
     } = authHook;
 
     const {
@@ -903,6 +923,35 @@ export default function Track({ auth, applications, }: PageProps) {
                     setBatchTargets([]);
                 }}
                 onConfirm={deleteBatchApplications}
+            />
+
+            <ForgotPasswordModal
+                open={showForgotModal}
+                forgotStep={forgotStep}
+                forgotEmail={forgotEmail}
+                setForgotEmail={setForgotEmail}
+                expiryCountdown={expiryCountdown}
+                resendCooldown={resendCooldown}
+                newPassword={newPassword}
+                setNewPassword={setNewPassword}
+                confirmNewPassword={confirmNewPassword}
+                setConfirmNewPassword={setConfirmNewPassword}
+                onClose={resetForgotPassword}
+
+                onSendVerification={() => {
+                    setForgotStep('waiting');
+                    setResendCooldown(60);
+                }}
+
+                onCheckVerification={() => {
+                    setForgotStep('reset');
+                }}
+
+                onResend={() => {
+                    setResendCooldown(60);
+                }}
+
+                onResetPassword={() => {}}
             />
 
             {toast && (
