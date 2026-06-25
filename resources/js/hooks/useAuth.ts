@@ -21,6 +21,9 @@ export function useAuth() {
         confirmPassword: '',
     });
 
+    const [showForgotModal, setShowForgotModal] =
+    useState(false);
+
     const resetAuthForm = () => {
         setAuthForm({
             name: '',
@@ -159,5 +162,8 @@ export function useAuth() {
 
         resetAuthForm,
         handleAuthSubmit,
+
+        showForgotModal,
+        setShowForgotModal,
     };
 }

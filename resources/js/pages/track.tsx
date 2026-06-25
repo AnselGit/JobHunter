@@ -146,6 +146,9 @@ export default function Track({ auth, applications, }: PageProps) {
 
         resetAuthForm,
         handleAuthSubmit,
+
+        showForgotModal,
+        setShowForgotModal,
     } = authHook;
 
     const {
@@ -478,6 +481,24 @@ export default function Track({ auth, applications, }: PageProps) {
                                                     ? 'Login'
                                                     : 'Create Account'}
                                             </button>
+
+                                            {authMode === 'login' && (
+                                                <div className="mt-3 text-center">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowForgotModal(true)}
+                                                        className="
+                                                            text-sm
+                                                            text-sky-600
+                                                            hover:text-sky-700
+                                                            hover:underline
+                                                        "
+                                                    >
+                                                        Forgot Password?
+                                                    </button>
+                                                </div>
+                                            )}
+                                            
                                         </form>
                                     </div>
                                 </div>
