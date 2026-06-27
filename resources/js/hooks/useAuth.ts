@@ -77,8 +77,7 @@ export function useAuth() {
     useEffect(() => {
         if (
             forgotStep !== 'waiting' ||
-            !forgotEmail ||
-            expiryCountdown <= 0
+            !forgotEmail
         ) {
             return;
         }
@@ -89,56 +88,41 @@ export function useAuth() {
                     '/forgot-password/status',
                     {
                         method: 'POST',
-
                         headers: {
-                            'Content-Type':
-                                'application/json',
-
-                            'X-CSRF-TOKEN':
-                                (
-                                    document.querySelector(
-                                        'meta[name="csrf-token"]'
-                                    ) as HTMLMetaElement
-                                )?.content,
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': (
+                                document.querySelector(
+                                    'meta[name="csrf-token"]'
+                                ) as HTMLMetaElement
+                            )?.content,
                         },
-
                         body: JSON.stringify({
                             email: forgotEmail,
                         }),
                     }
                 );
 
-                const data =
-                    await response.json();
+                const data = await response.json();
 
                 if (data.verified) {
                     setEmailVerified(true);
                     setForgotStep('reset');
                 }
-            } catch (error) {
-                console.error(
-                    'Verification check failed:',
-                    error
-                );
+            } catch (e) {
+                console.error(e);
             }
         }, 3000);
 
         return () => clearInterval(interval);
+
     }, [
         forgotStep,
         forgotEmail,
-        expiryCountdown,
     ]);
 
     useEffect(() => {
-        if (resendCooldown <= 0) return;
-
-        const timer = setTimeout(() => {
-            setResendCooldown((v) => v - 1);
-        }, 1000);
-
-        return () => clearTimeout(timer);
-    }, [resendCooldown]);
+        console.log('forgotStep changed:', forgotStep);
+    }, [forgotStep]);
 
     const resetAuthForm = () => {
         setAuthForm({

@@ -161,6 +161,7 @@ export default function Track({ auth, applications, }: PageProps) {
         setResendCooldown,
 
         expiryCountdown,
+        setExpiryCountdown,
 
         newPassword,
         setNewPassword,
@@ -958,9 +959,10 @@ export default function Track({ auth, applications, }: PageProps) {
 
                             onSuccess: (page) => {
                                 console.log('SUCCESS', page);
-
                                 setForgotStep('waiting');
+                                setExpiryCountdown(300);
                                 setResendCooldown(30);
+                                console.log('waiting set');
                             },
 
                             onError: (errors) => {
@@ -982,7 +984,63 @@ export default function Track({ auth, applications, }: PageProps) {
                     setResendCooldown(30);
                 }}
 
-                onResetPassword={() => {}}
+                onResetPassword={async () => {
+                    if (newPassword !== confirmNewPassword) {
+                        alert('Passwords do not match.');
+                        return;
+                    }
+
+                    if (newPassword.length < 6) {
+                        alert('Password must be at least 6 characters.');
+                        return;
+                    }
+
+                    const response = await fetch('/forgot-password/reset', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': (
+                                document.querySelector(
+                                    'meta[name="csrf-token"]'
+                                ) as HTMLMetaElement
+                            ).content,
+                        },
+                        body: JSON.stringify({
+                            email: forgotEmail,
+                            password: newPassword,
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Switch back to Login
+                        setAuthMode('login');
+
+                        // Close & reset forgot password modal
+                        resetForgotPassword();
+
+                        // Show success toast
+                        setToast({
+                            type: 'success',
+                            message: 'Password changed successfully. You can now log in.',
+                        });
+
+                        // Hide toast after 3 seconds
+                        setTimeout(() => {
+                            setToast(null);
+                        }, 3000);
+                    } else {
+                        setToast({
+                            type: 'error',
+                            message: data.message ?? 'Failed to reset password.',
+                        });
+
+                        setTimeout(() => {
+                            setToast(null);
+                        }, 3000);
+                    }
+                }}
             />
 
             {toast && (

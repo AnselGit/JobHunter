@@ -102,32 +102,150 @@ class AuthController extends Controller
 
         Mail::html(
             "
-            <h2>Password Reset Verification</h2>
-
-            <p>Click the button below to verify your email.</p>
-
-            <a href='{$url}'
-            style='
-                display:inline-block;
-                padding:12px 20px;
-                background:#0ea5e9;
-                color:white;
-                text-decoration:none;
-                border-radius:8px;
+            <div style='
+                margin:0;
+                padding:40px 20px;
+                background:#f1f5f9;
+                font-family:Segoe UI,Arial,sans-serif;
             '>
-                Verify Email
-            </a>
 
-            <p>
-                This link expires in 5 minutes.
-            </p>
+                <table
+                    align='center'
+                    cellpadding='0'
+                    cellspacing='0'
+                    width='100%'
+                    style='max-width:600px;'
+                >
+                    <tr>
+                        <td
+                            style='
+                                background:#ffffff;
+                                border-radius:20px;
+                                padding:48px;
+                                box-shadow:0 10px 35px rgba(15,23,42,.08);
+                                text-align:center;
+                            '
+                        >
+
+                            <div
+                                style='
+                                    width:80px;
+                                    height:80px;
+                                    margin:0 auto 28px;
+                                    border-radius:50%;
+                                    background:#e0f2fe;
+                                    font-size:38px;
+                                    line-height:80px;
+                                '
+                            >
+                                🔒
+                            </div>
+
+                            <h1
+                                style='
+                                    margin:0;
+                                    color:#0f172a;
+                                    font-size:30px;
+                                    font-weight:700;
+                                '
+                            >
+                                Password Reset
+                            </h1>
+
+                            <p
+                                style='
+                                    margin:22px 0;
+                                    color:#64748b;
+                                    font-size:16px;
+                                    line-height:28px;
+                                '
+                            >
+                                We received a request to reset the password for your
+                                <strong>JobHunter</strong> account.
+                                <br><br>
+                                Click the button below to verify your email before
+                                creating a new password.
+                            </p>
+
+                            <a
+                                href='{$url}'
+                                style='
+                                    display:inline-block;
+                                    background:#38bdf8;
+                                    color:#ffffff;
+                                    text-decoration:none;
+                                    font-weight:600;
+                                    padding:16px 34px;
+                                    border-radius:12px;
+                                    font-size:16px;
+                                '
+                            >
+                                Verify Email
+                            </a>
+
+                            <div
+                                style='
+                                    margin-top:35px;
+                                    padding:18px;
+                                    border-radius:12px;
+                                    background:#f8fafc;
+                                    color:#475569;
+                                    font-size:14px;
+                                    line-height:24px;
+                                '
+                            >
+                                <strong>This verification link expires in 5 minutes.</strong>
+                                <br>
+                                For your security, it can only be used once.
+                            </div>
+
+                            <hr
+                                style='
+                                    margin:36px 0;
+                                    border:none;
+                                    border-top:1px solid #e2e8f0;
+                                '
+                            >
+
+                            <p
+                                style='
+                                    margin:0;
+                                    color:#94a3b8;
+                                    font-size:13px;
+                                    line-height:22px;
+                                '
+                            >
+                                If you didn't request a password reset,
+                                you can safely ignore this email.
+                                Your password will remain unchanged.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td
+                            style='
+                                padding:24px;
+                                text-align:center;
+                                color:#94a3b8;
+                                font-size:13px;
+                            '
+                        >
+                            © " . date('Y') . " JobHunter
+                            <br>
+                            Helping you track every application.
+                        </td>
+                    </tr>
+
+                </table>
+
+            </div>
             ",
             function ($message) use ($request) {
                 $message
                     ->to($request->email)
-                    ->subject(
-                        'JobHunter Password Reset'
-                    );
+                    ->subject('JobHunter Password Reset');
             }
         );
 
@@ -150,7 +268,86 @@ class AuthController extends Controller
                 $verification->expires_at
             )
         ) {
-            return 'Verification link expired.';
+            return '
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Link Expired</title>
+            </head>
+            <body style="
+                margin:0;
+                background:#f1f5f9;
+                font-family:Segoe UI,Arial,sans-serif;
+                padding:40px 20px;
+            ">
+
+                <table
+                    align="center"
+                    cellpadding="0"
+                    cellspacing="0"
+                    width="100%"
+                    style="max-width:600px;"
+                >
+                    <tr>
+                        <td style="
+                            background:#ffffff;
+                            border-radius:20px;
+                            padding:48px;
+                            text-align:center;
+                            box-shadow:0 10px 35px rgba(15,23,42,.08);
+                        ">
+
+                            <div style="
+                                width:80px;
+                                height:80px;
+                                margin:0 auto 28px;
+                                border-radius:50%;
+                                background:#fee2e2;
+                                line-height:80px;
+                                font-size:40px;
+                            ">
+                                ❌
+                            </div>
+
+                            <h1 style="
+                                margin:0;
+                                color:#dc2626;
+                                font-size:30px;
+                            ">
+                                Verification Link Expired
+                            </h1>
+
+                            <p style="
+                                margin:22px 0;
+                                color:#64748b;
+                                font-size:16px;
+                                line-height:28px;
+                            ">
+                                This password reset verification link
+                                has expired or is no longer valid.
+                            </p>
+
+                            <div style="
+                                margin-top:30px;
+                                padding:18px;
+                                border-radius:12px;
+                                background:#fef2f2;
+                                color:#991b1b;
+                                font-size:14px;
+                                line-height:24px;
+                            ">
+                                Please return to JobHunter and request
+                                a new password reset email.
+                            </div>
+
+                        </td>
+                    </tr>
+                </table>
+
+            </body>
+            </html>
+            ';
         }
 
         $verification->update([
@@ -158,8 +355,104 @@ class AuthController extends Controller
         ]);
 
         return '
-            <h2>Email Verified</h2>
-            <p>You may now return to JobHunter and reset your password.</p>
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset="UTF-8">
+                <title>Email Verified</title>
+            </head>
+
+            <body style="
+                margin:0;
+                background:#f1f5f9;
+                font-family:Segoe UI,Arial,sans-serif;
+                padding:40px 20px;
+            ">
+
+                <table
+                    align="center"
+                    cellpadding="0"
+                    cellspacing="0"
+                    width="100%"
+                    style="max-width:600px;"
+                >
+                    <tr>
+                        <td style="
+                            background:#ffffff;
+                            border-radius:20px;
+                            padding:48px;
+                            text-align:center;
+                            box-shadow:0 10px 35px rgba(15,23,42,.08);
+                        ">
+
+                            <div style="
+                                width:80px;
+                                height:80px;
+                                margin:0 auto 28px;
+                                border-radius:50%;
+                                background:#dcfce7;
+                                line-height:80px;
+                                font-size:40px;
+                            ">
+                                ✓
+                            </div>
+
+                            <h1 style="
+                                margin:0;
+                                color:#166534;
+                                font-size:30px;
+                                font-weight:700;
+                            ">
+                                Email Verified
+                            </h1>
+
+                            <p style="
+                                margin:22px 0;
+                                color:#64748b;
+                                font-size:16px;
+                                line-height:28px;
+                            ">
+                                Your email has been successfully verified.
+                                <br><br>
+                                You may now return to
+                                <strong>JobHunter</strong>
+                                and continue resetting your password.
+                            </p>
+
+                            <div style="
+                                margin-top:30px;
+                                padding:18px;
+                                border-radius:12px;
+                                background:#f0fdf4;
+                                color:#166534;
+                                font-size:14px;
+                                line-height:24px;
+                            ">
+                                Verification complete.
+                                <br>
+                                You may now close this tab and return to the JobHunter application.
+                            </div>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="
+                            padding:24px;
+                            text-align:center;
+                            color:#94a3b8;
+                            font-size:13px;
+                        ">
+                            © ' . date('Y') . ' JobHunter
+                            <br>
+                            Helping you track every application.
+                        </td>
+                    </tr>
+
+                </table>
+
+            </body>
+            </html>
         ';
     }
 
@@ -218,4 +511,4 @@ class AuthController extends Controller
             'success' => true,
         ]);
     }
-}
+}   
