@@ -62,7 +62,7 @@ The system helps job seekers stay organized throughout their job search while re
 
 ## Database
 
-- MySQL
+- SQlite
 
 ---
 
