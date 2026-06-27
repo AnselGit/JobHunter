@@ -938,9 +938,40 @@ export default function Track({ auth, applications, }: PageProps) {
                 setConfirmNewPassword={setConfirmNewPassword}
                 onClose={resetForgotPassword}
 
+                
                 onSendVerification={() => {
-                    setForgotStep('waiting');
-                    setResendCooldown(60);
+                    router.post(
+                        '/forgot-password/send',
+                        {
+                            email: forgotEmail,
+                        },
+                        {
+                            preserveScroll: true,
+
+                            onStart: () => {
+                                console.log('START');
+                            },
+
+                            onProgress: () => {
+                                console.log('PROGRESS');
+                            },
+
+                            onSuccess: (page) => {
+                                console.log('SUCCESS', page);
+
+                                setForgotStep('waiting');
+                                setResendCooldown(30);
+                            },
+
+                            onError: (errors) => {
+                                console.log('ERROR', errors);
+                            },
+
+                            onFinish: () => {
+                                console.log('FINISH');
+                            },
+                        }
+                    );
                 }}
 
                 onCheckVerification={() => {
@@ -948,7 +979,7 @@ export default function Track({ auth, applications, }: PageProps) {
                 }}
 
                 onResend={() => {
-                    setResendCooldown(60);
+                    setResendCooldown(30);
                 }}
 
                 onResetPassword={() => {}}

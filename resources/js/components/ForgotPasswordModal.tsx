@@ -43,205 +43,197 @@ export default function ForgotPasswordModal({
     onClose,
 
     onSendVerification,
-    onCheckVerification,
     onResend,
     onResetPassword,
 }: Props) {
     if (!open) return null;
 
-    const minutes = Math.floor(
-        expiryCountdown / 60
-    );
-
-    const seconds =
-        expiryCountdown % 60;
+    const minutes = Math.floor(expiryCountdown / 60);
+    const seconds = expiryCountdown % 60;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
-
-                {/* EMAIL STEP */}
+            <div className="relative w-full max-w-md rounded-3xl bg-white p-6 shadow-2xl">
+                <button
+                    onClick={onClose}
+                    className="absolute right-4 top-4 h-8 w-8 rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-100"
+                >
+                    ✕
+                </button>
 
                 {forgotStep === 'email' && (
                     <>
-                        <h2 className="text-xl font-semibold mb-2">
+                        <h2 className="text-xl font-semibold text-slate-900">
                             Forgot Password
                         </h2>
 
-                        <p className="text-sm text-slate-500 mb-4">
-                            Enter your email address.
+                        <p className="mt-2 text-sm text-slate-500">
+                            Enter the email address associated with your account.
                         </p>
 
-                        <input
-                            type="email"
-                            value={forgotEmail}
-                            onChange={(e) =>
-                                setForgotEmail(
-                                    e.target.value
-                                )
-                            }
-                            placeholder="Email Address"
-                            className="
-                                w-full
-                                rounded-xl
-                                border
-                                border-slate-200
-                                px-4
-                                py-3
-                            "
-                        />
-
-                        <div className="mt-5 flex justify-end gap-2">
-                            <button
-                                onClick={onClose}
+                        <div className="mt-5">
+                            <input
+                                type="email"
+                                value={forgotEmail}
+                                onChange={(e) =>
+                                    setForgotEmail(e.target.value)
+                                }
+                                placeholder="Email Address"
                                 className="
+                                    w-full
                                     rounded-xl
                                     border
+                                    border-slate-200
                                     px-4
-                                    py-2
-                                "
-                            >
-                                Cancel
-                            </button>
-
-                            <button
-                                onClick={
-                                    onSendVerification
-                                }
-                                className="
-                                    rounded-xl
-                                    bg-sky-500
-                                    px-4
-                                    py-2
-                                    text-white
-                                "
-                            >
-                                Send Email
-                            </button>
-                        </div>
-                    </>
-                )}
-
-                {/* WAITING STEP */}
-
-                {forgotStep === 'waiting' && (
-                    <>
-                        <h2 className="text-xl font-semibold mb-2">
-                            Verification Sent
-                        </h2>
-
-                        <p className="text-sm text-slate-500 mb-2">
-                            {forgotEmail}
-                        </p>
-
-                        <div className="mb-4 text-center text-lg font-semibold text-sky-600">
-                            {minutes}:
-                            {seconds
-                                .toString()
-                                .padStart(2, '0')}
-                        </div>
-
-                        <p className="text-center text-sm text-slate-500 mb-6">
-                            Waiting for email
-                            verification...
-                        </p>
-
-                        <div className="flex flex-col gap-2">
-                            <button
-                                onClick={
-                                    onCheckVerification
-                                }
-                                className="
-                                    rounded-xl
-                                    bg-sky-500
                                     py-3
-                                    text-white
+                                    outline-none
+                                    focus:border-sky-500
                                 "
-                            >
-                                I've Verified My Email
-                            </button>
-
-                            <button
-                                disabled={
-                                    resendCooldown > 0
-                                }
-                                onClick={onResend}
-                                className="
-                                    rounded-xl
-                                    border
-                                    py-3
-                                "
-                            >
-                                {resendCooldown > 0
-                                    ? `Resend (${resendCooldown}s)`
-                                    : 'Resend Email'}
-                            </button>
+                            />
                         </div>
-                    </>
-                )}
-
-                {/* RESET STEP */}
-
-                {forgotStep === 'reset' && (
-                    <>
-                        <h2 className="text-xl font-semibold mb-2">
-                            Reset Password
-                        </h2>
-
-                        <p className="text-sm text-green-600 mb-4">
-                            Email verified successfully.
-                        </p>
-
-                        <input
-                            type="password"
-                            value={newPassword}
-                            onChange={(e) =>
-                                setNewPassword(
-                                    e.target.value
-                                )
-                            }
-                            placeholder="New Password"
-                            className="
-                                w-full
-                                rounded-xl
-                                border
-                                border-slate-200
-                                px-4
-                                py-3
-                                mb-3
-                            "
-                        />
-
-                        <input
-                            type="password"
-                            value={confirmNewPassword}
-                            onChange={(e) =>
-                                setConfirmNewPassword(
-                                    e.target.value
-                                )
-                            }
-                            placeholder="Confirm Password"
-                            className="
-                                w-full
-                                rounded-xl
-                                border
-                                border-slate-200
-                                px-4
-                                py-3
-                            "
-                        />
 
                         <button
-                            onClick={
-                                onResetPassword
-                            }
+                            onClick={onSendVerification}
                             className="
                                 mt-5
                                 w-full
                                 rounded-xl
                                 bg-sky-500
                                 py-3
+                                font-medium
                                 text-white
+                                transition-all
+                                hover:bg-sky-600
+                            "
+                        >
+                            Send Verification Email
+                        </button>
+                    </>
+                )}
+
+                {forgotStep === 'waiting' && (
+                    <div className="text-center">
+                        <h2 className="text-xl font-semibold text-slate-900">
+                            Verification Sent
+                        </h2>
+
+                        <p className="mt-2 text-sm text-slate-500">
+                            A verification link has been sent to
+                        </p>
+
+                        <p className="mt-1 break-all font-medium text-slate-700">
+                            {forgotEmail}
+                        </p>
+
+                        <div className="mt-6">
+                            <div className="text-3xl font-bold text-sky-600">
+                                {minutes}:
+                                {seconds
+                                    .toString()
+                                    .padStart(2, '0')}
+                            </div>
+
+                            <p className="mt-2 text-sm text-slate-500">
+                                Link expires in 5 minutes
+                            </p>
+                        </div>
+
+                        <div className="mt-6 flex justify-center">
+                            <div className="h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-sky-500" />
+                        </div>
+
+                        <p className="mt-4 text-sm text-slate-500">
+                            Waiting for verification...
+                        </p>
+
+                        <button
+                            disabled={resendCooldown > 0}
+                            onClick={onResend}
+                            className="
+                                mt-6
+                                w-full
+                                rounded-xl
+                                border
+                                border-slate-200
+                                py-3
+                                font-medium
+                                transition-all
+                                hover:bg-slate-50
+                                disabled:cursor-not-allowed
+                                disabled:opacity-50
+                            "
+                        >
+                            {resendCooldown > 0
+                                ? `Resend Email (${resendCooldown}s)`
+                                : 'Resend Email'}
+                        </button>
+                    </div>
+                )}
+
+                {forgotStep === 'reset' && (
+                    <>
+                        <h2 className="text-xl font-semibold text-slate-900">
+                            Reset Password
+                        </h2>
+
+                        <p className="mt-2 text-sm text-green-600">
+                            ✓ Email verified successfully
+                        </p>
+
+                        <div className="mt-5 space-y-3">
+                            <input
+                                type="password"
+                                value={newPassword}
+                                onChange={(e) =>
+                                    setNewPassword(e.target.value)
+                                }
+                                placeholder="New Password"
+                                className="
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    px-4
+                                    py-3
+                                    outline-none
+                                    focus:border-sky-500
+                                "
+                            />
+
+                            <input
+                                type="password"
+                                value={confirmNewPassword}
+                                onChange={(e) =>
+                                    setConfirmNewPassword(
+                                        e.target.value
+                                    )
+                                }
+                                placeholder="Confirm Password"
+                                className="
+                                    w-full
+                                    rounded-xl
+                                    border
+                                    border-slate-200
+                                    px-4
+                                    py-3
+                                    outline-none
+                                    focus:border-sky-500
+                                "
+                            />
+                        </div>
+
+                        <button
+                            onClick={onResetPassword}
+                            className="
+                                mt-5
+                                w-full
+                                rounded-xl
+                                bg-sky-500
+                                py-3
+                                font-medium
+                                text-white
+                                transition-all
+                                hover:bg-sky-600
                             "
                         >
                             Change Password

@@ -56,11 +56,79 @@ export function useAuth() {
         }
 
         const timer = setTimeout(() => {
-            setExpiryCountdown((v) => v - 1);
+            setExpiryCountdown((prev) => prev - 1);
         }, 1000);
 
         return () => clearTimeout(timer);
     }, [forgotStep, expiryCountdown]);
+
+    useEffect(() => {
+        if (resendCooldown <= 0) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setResendCooldown((prev) => prev - 1);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, [resendCooldown]);
+
+    useEffect(() => {
+        if (
+            forgotStep !== 'waiting' ||
+            !forgotEmail ||
+            expiryCountdown <= 0
+        ) {
+            return;
+        }
+
+        const interval = setInterval(async () => {
+            try {
+                const response = await fetch(
+                    '/forgot-password/status',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json',
+
+                            'X-CSRF-TOKEN':
+                                (
+                                    document.querySelector(
+                                        'meta[name="csrf-token"]'
+                                    ) as HTMLMetaElement
+                                )?.content,
+                        },
+
+                        body: JSON.stringify({
+                            email: forgotEmail,
+                        }),
+                    }
+                );
+
+                const data =
+                    await response.json();
+
+                if (data.verified) {
+                    setEmailVerified(true);
+                    setForgotStep('reset');
+                }
+            } catch (error) {
+                console.error(
+                    'Verification check failed:',
+                    error
+                );
+            }
+        }, 3000);
+
+        return () => clearInterval(interval);
+    }, [
+        forgotStep,
+        forgotEmail,
+        expiryCountdown,
+    ]);
 
     useEffect(() => {
         if (resendCooldown <= 0) return;
